@@ -5,6 +5,7 @@
   <title>Ergastério São Lucas</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="assets/css/topbar.css" />
 <style>/* ====== Card base ====== */
 .pm-card{
   --bg:#ffffff;
@@ -473,57 +474,30 @@ Bands/Sections:
   </head>
   <body id="ibm-com"  uuid="13191044-6a14-4729-9e45-bd694fad7d27" class="path-node page-node-type-page-wrapper ibm-type">
       
-      <header class="menu site-header" id="appMenu">
-    <div class="menu-top">
-
-      <div class="menu-actions">
-        <div class="menu-brand">
-        <div class="menu-logo" data-view="home" href="#">
-  <!--img src="uploads/logoErgasterio.svg" alt="Logo Ergastério São Lucas"-->
-  <span>Ergastério São Lucas</span>
-</div>
-        <!--span class="menu-tagline">Hub de leilões e ativos digitais</span-->
+      <header class="app-topbar" id="appMenu">
+    <div class="topbar-main">
+      <div class="topbar-left">
+        <a class="topbar-logo" data-view="home" href="#" aria-label="Ir para Home">
+          <span>Ergastério São Lucas</span>
+        </a>
       </div>
-        
-        <div class="menu-brand"><button class="auth-trigger" id="openAuthBtn" type="button">Entrar</button></div>
-        <div id="authBoxAnchor">
-          <div id="authBox" class="card">
-            <!-- Login -->
-            <form id="loginForm">
-              <input type="email" id="email" placeholder="email" required />
-              <input type="password" id="password" placeholder="senha" required />
-              <button type="submit">Entrar</button>
-            </form>
-
-            <!-- Sessão ativa -->
-            <div id="loggedBox" class="logged-chip" hidden>
-              <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar do perfil" />
-              <div class="profile-meta">
-                <strong id="profileName">Usuário</strong>
-                <small id="profileEmail"></small>
-              </div>
-              <button id="logoutBtn" type="button">Sair</button>
-            </div>
-
-            <hr/>
-
-            <!-- Toggle Registro -->
-            <button id="toggleRegister" class="ghost">Registrar novo usuário</button>
-            <form id="registerForm" style="display:none; margin-top:8px;">
-              <input type="text" id="r_name" placeholder="nome" required />
-              <input type="email" id="r_email" placeholder="email" required />
-              <input type="tel" id="r_phone" placeholder="telefone com DDD (opcional)" />
-              <input type="password" id="r_password" placeholder="senha" required />
-              <button type="submit">Criar conta</button>
-            </form>
-            <p id="authMsg" class="msg"></p>
-          </div>
-        </div>
-        <!--div class="menu-brand"><span class="menu-actions__icon" aria-hidden="true">🔎</span></div-->
+      <div class="topbar-center">
+        <label class="topbar-search" for="topbarSearchInput">
+          <span aria-hidden="true">🔍</span>
+          <input id="topbarSearchInput" type="search" placeholder="Buscar mercados, eventos, coleções..." autocomplete="off" />
+        </label>
+      </div>
+      <div class="topbar-right" id="topbarRight"></div>
+      <div class="topbar-mobile-actions">
+        <button type="button" class="topbar-mobile-icon" id="topbarSearchBtn" aria-label="Abrir busca">🔍</button>
+        <button type="button" class="topbar-mobile-icon" id="menuToggle" aria-label="Abrir menu" aria-controls="topbarMobilePanel" aria-expanded="false">
+          <span class="menu-toggle__icon" aria-hidden="true"><span class="menu-toggle__bar"></span><span class="menu-toggle__bar"></span><span class="menu-toggle__bar"></span></span>
+        </button>
       </div>
     </div>
-
-    <div class="menu-content2" id="menuContent">
+    <div class="topbar-mobile-panel" id="topbarMobilePanel">
+      <div class="topbar-mobile-shortcuts" id="topbarMobileShortcuts"></div>
+      <div class="topbar-mobile-account" id="topbarMobileAccount"></div>
       <nav class="menu-nav" aria-label="Navegação principal">
         <ul>
           <li><a href="#" data-view="home" aria-current="page">Home</a></li>
@@ -543,6 +517,33 @@ Bands/Sections:
           <li class="admin-only"><a href="#" data-view="admin_mint">Mint de NFT</a></li>
         </ul>
       </nav>
+    </div>
+    <div id="authBoxAnchor">
+      <div id="authBox" class="card" hidden>
+        <form id="loginForm">
+          <input type="email" id="email" placeholder="email" required />
+          <input type="password" id="password" placeholder="senha" required />
+          <button type="submit">Entrar</button>
+        </form>
+        <div id="loggedBox" class="logged-chip" hidden>
+          <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar do perfil" />
+          <div class="profile-meta">
+            <strong id="profileName">Usuário</strong>
+            <small id="profileEmail"></small>
+          </div>
+          <button id="logoutBtn" type="button">Sair</button>
+        </div>
+        <hr/>
+        <button id="toggleRegister" class="ghost">Registrar novo usuário</button>
+        <form id="registerForm" style="display:none; margin-top:8px;">
+          <input type="text" id="r_name" placeholder="nome" required />
+          <input type="email" id="r_email" placeholder="email" required />
+          <input type="tel" id="r_phone" placeholder="telefone com DDD (opcional)" />
+          <input type="password" id="r_password" placeholder="senha" required />
+          <button type="submit">Criar conta</button>
+        </form>
+        <p id="authMsg" class="msg"></p>
+      </div>
     </div>
   </header>
     
@@ -2223,6 +2224,7 @@ Bands/Sections:
     </div>
   </section>
 
+  <script src="assets/js/topbar.js"></script>
   <script src="app.js"></script>
   
 
