@@ -19,13 +19,29 @@ const state = {
     let detailPollTimer = null;
     const submittingForms = new WeakSet();
 
-    const overviewEl = document.getElementById('marketOverview');
-    const listEl = document.getElementById('marketList');
-    const detailEl = document.getElementById('marketDetail');
-    const resolveFormEl = document.querySelector('[data-role="resolve-market-form"]');
-    const claimFormEl = document.querySelector('[data-role="claim-market-form"]');
-    const resolveDialogEl = document.getElementById('resolveConfirmDialog');
-    const resolveSummaryEl = resolveDialogEl?.querySelector('[data-role="resolve-confirm-summary"]');
+    let overviewEl = null;
+    let listEl = null;
+    let detailEl = null;
+    let resolveFormEl = null;
+    let claimFormEl = null;
+    let resolveDialogEl = null;
+    let resolveSummaryEl = null;
+
+    // SPA reinjeta o HTML da view; por isso as refs de DOM precisam ser rebindadas no retorno.
+    const bindDom = () => {
+      overviewEl = document.getElementById('marketOverview');
+      listEl = document.getElementById('marketList');
+      detailEl = document.getElementById('marketDetail');
+      resolveFormEl = document.querySelector('[data-role="resolve-market-form"]');
+      claimFormEl = document.querySelector('[data-role="claim-market-form"]');
+      resolveDialogEl = document.getElementById('resolveConfirmDialog');
+      resolveSummaryEl = resolveDialogEl?.querySelector('[data-role="resolve-confirm-summary"]') || null;
+    };
+
+    const domReady = () => {
+      if (!overviewEl || !listEl || !detailEl) bindDom();
+      return Boolean(overviewEl && listEl && detailEl);
+    };
 
     const renderMarketListSkeleton = (count = 4) => Array.from({ length: count }, () => `
       <article class="market-card market-card--skeleton" aria-hidden="true">
@@ -321,6 +337,7 @@ const state = {
     };
 
     const refreshMarketDetail = async (marketId) => {
+      if (!domReady()) return;
       if (!marketId) return;
       if (state.isLoadingDetail) return;
       state.isLoadingDetail = true;
@@ -345,6 +362,7 @@ const state = {
     };
 
     const loadMarkets = async ({ soft = false, includeDetail = true } = {}) => {
+      if (!domReady()) return;
       if (state.isLoadingMarkets) return;
       state.isLoadingMarkets = true;
       if (!soft) {
@@ -583,6 +601,10 @@ Confirma a resolução?`));
     };
 
     document.addEventListener('visibilitychange', () => {
+      if (!domReady()) {
+        stopPolling();
+        return;
+      }
       if (document.visibilityState === 'hidden') {
         stopPolling();
         return;
@@ -677,6 +699,7 @@ Confirma a resolução?`));
       }
     });
 
+    bindDom();
     loadMarkets();
     if (document.visibilityState === 'visible') {
       startPolling();
@@ -684,8 +707,9 @@ Confirma a resolução?`));
 
 
 window.refreshMercadoLmsr = () => {
+  bindDom();
   loadMarkets();
-  if (document.visibilityState === 'visible') startPolling();
+  if (document.visibilityState === 'visible' && domReady()) startPolling();
 };
 window.teardownMercadoLmsr = () => {
   stopPolling();

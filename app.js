@@ -699,6 +699,8 @@ async function loadSpaPartial(partialUrl, options = {}){
   const view = getSpaView();
   if (!view) return;
 
+  window.teardownMercadoLmsr?.();
+
   view.className = 'landing-view spa-partial-view';
   view.innerHTML = '<section class="spa-load-status"><p class="hint">Carregando conteúdo...</p></section>';
 
