@@ -16,18 +16,6 @@ let currentSession = {
   special_liquidity_email:null
 };
 
-window.APP_STATE = window.APP_STATE || { user:null, balances:{ portfolio:0, cash:0 } };
-
-async function loadTopbarBalances(){
-  if (!currentSession.logged) return { portfolio:0, cash:0 };
-  const data = await getJSON(API('balance.php'));
-  if (!data || data.__auth === false || !Array.isArray(data.accounts)) return { portfolio:0, cash:0 };
-  const cash = data.accounts
-    .filter(acc => normalizeCurrencyCode(acc.currency) === 'BRL')
-    .reduce((total, acc)=> total + Number(acc.balance || 0), 0);
-  return { portfolio: cash, cash };
-}
-
 let authOverlayEscHandler = null;
 
 const LIQUIDITY_GAME_GUEST_STORAGE_KEY = 'liquidity_game_guest_state';
@@ -75,7 +63,6 @@ function moveAuthBoxToOverlay(){
   if (!overlaySlot.contains(authBox)) {
     overlaySlot.appendChild(authBox);
   }
-  authBox.hidden = false;
   return true;
 }
 
@@ -85,7 +72,6 @@ function restoreAuthBoxToMenu(){
   if (anchor && authBox && !anchor.contains(authBox)) {
     anchor.prepend(authBox);
   }
-  if (authBox) authBox.hidden = true;
 }
 
 function closeAuthOverlay(){
@@ -2558,21 +2544,6 @@ async function refreshAuthUI(){
     if (profileEmail) profileEmail.textContent = '';
   }
 
-  const balances = await loadTopbarBalances();
-  window.APP_STATE = {
-    user: currentSession.logged ? {
-      id: currentSession.user_id,
-      name: currentSession.name,
-      email: currentSession.email,
-      avatar_url: currentSession.avatar_url || null,
-    } : null,
-    balances
-  };
-
-  if (window.Topbar && typeof window.Topbar.update === 'function') {
-    window.Topbar.update({ ...currentSession, user: window.APP_STATE.user }, balances);
-  }
-
   if (document.body) {
     document.body.classList.toggle('is-admin', currentSession.is_admin);
     document.body.classList.toggle('is-special-liquidity-user', currentSession.is_special_liquidity_user);
@@ -2612,20 +2583,13 @@ function initAuth(){
       msg.classList.add('err');
     }
   });
-  const logout = async ()=>{
+  // logout
+  document.getElementById('logoutBtn').addEventListener('click', async ()=>{
     await fetch(AUTH('logout.php'), { method:'POST', credentials:'include', headers: window.__csrfToken ? {'X-CSRF-Token': window.__csrfToken} : {} });
-    localStorage.removeItem('authToken');
-    sessionStorage.removeItem('authToken');
     await refreshAuthUI();
     closeAuthOverlay();
-    navigateToView('home', { updateUrl: true });
-  };
-
-  // logout
-  document.getElementById('logoutBtn').addEventListener('click', logout);
-  if (window.Topbar && typeof window.Topbar.setLogoutHandler === 'function') {
-    window.Topbar.setLogoutHandler(logout);
-  }
+    getSpaView().innerHTML = `<h1>Até mais!</h1><p>Você saiu da conta.</p>`;
+  });
   // toggle register
   const toggle = document.getElementById('toggleRegister');
   const form = document.getElementById('registerForm');
@@ -6735,7 +6699,7 @@ async function viewAuctions(){
           <span>Explore todos os lotes livremente, no estilo OpenSea. Para dar um lance, conecte-se.</span>
           <div class="auction-hero-actions">
             <button type="button" data-role="auction-refresh">Atualizar leilões</button>
-            ${currentSession.logged ? "" : `<button type="button" class="ghost" data-role="focus-login">Entrar para dar lance</button>`}
+            <button type="button" class="ghost" data-role="focus-login">Entrar para dar lance</button>
           </div>
           <!--div class="auction-hero-stats">
             <div>
@@ -6846,7 +6810,7 @@ const VIEW_TO_ROUTE = Object.entries(ROUTE_TO_VIEW).reduce((acc, [route, view])=
 });
 
 function setActiveMenuItem(viewName){
-  const menuLinks = document.querySelectorAll('.menu-nav a[data-view]');
+  const menuLinks = document.querySelectorAll('.menu a[data-view]');
   menuLinks.forEach(link=>{
     const isActive = link.dataset.view === viewName;
     link.classList.toggle('is-active', isActive);
@@ -6939,33 +6903,9 @@ function initAuthTrigger(){
   });
 }
 
-function initTopbarActions(){
-  document.addEventListener('topbar:action', (event)=>{
-    const action = event.detail && event.detail.action;
-    if (!action) return;
-    if (action === 'login') return showAuthOverlay();
-    if (action === 'signup') return showAuthOverlay({ focusRegister:true });
-    if (action === 'how-it-works') return navigateToView('mechanics', { updateUrl:true });
-    if (action === 'deposit') return navigateToView('user_assets', { updateUrl:true });
-    if (action === 'profile') return navigateToView('user_assets', { updateUrl:true });
-    if (action === 'assets') return navigateToView('user_assets', { updateUrl:true });
-    if (action === 'settings') return navigateToView('materiais', { updateUrl:true });
-  });
-
-  const searchInput = document.getElementById('topbarSearchInput');
-  if (searchInput){
-    searchInput.addEventListener('keydown', (event)=>{
-      if (event.key === 'Enter'){
-        event.preventDefault();
-        navigateToView('trending', { updateUrl:true });
-      }
-    });
-  }
-}
-
 function initResponsiveMenu(){
   const toggleBtn = document.getElementById('menuToggle');
-  const menuLinks = document.querySelectorAll('.menu-nav [data-view]');
+  const menuLinks = document.querySelectorAll('.menu [data-view]');
   if (!toggleBtn) return;
 
   const mobileQuery = window.matchMedia('(max-width: 960px)');
@@ -7126,9 +7066,7 @@ function initAmbientParallax(){
 /* ========= Init ========= */
 const defaultViewName = getSpaView()?.dataset.defaultView || 'home';
 initAuthOverlayControls();
-if (window.Topbar && typeof window.Topbar.init === "function") window.Topbar.init();
 initAuthTrigger();
-initTopbarActions();
 initMenu();
 initDeepLink();
 initHistoryNavigation();
