@@ -6761,19 +6761,33 @@ const VIEW_HANDLERS = {
 };
 
 const ROUTE_TO_VIEW = {
+  home: 'home',
   trending: 'trending',
+  'mecanica-unificada': 'mechanics',
   mechanics: 'mechanics',
+  'mercado-ao-vivo': 'live_market',
   'live-market': 'live_market',
+  'mercado-preditivo': 'mercado_preditivo',
+  mercado_preditivo: 'mercado_preditivo',
   'prediction-market': 'mercado_preditivo',
+  colecoes: 'collections',
   collections: 'collections',
+  leiloes: 'auctions',
   auctions: 'auctions',
+  eventos: 'events',
   events: 'events',
+  'meus-ativos': 'user_assets',
   assets: 'user_assets',
+  'transacoes-pendentes': 'pending_transactions',
   'pending-transactions': 'pending_transactions',
+  simulador: 'liquidity_game',
   simulator: 'liquidity_game',
   'mercados-lmsr': 'mercados_lmsr',
   materiais: 'materiais',
+  'painel-administrativo': 'admin',
   admin: 'admin',
+  mint: 'admin_mint',
+  'mint-nft': 'admin_mint',
   'admin-mint': 'admin_mint',
 };
 
@@ -6795,6 +6809,19 @@ function setActiveMenuItem(viewName){
       link.removeAttribute('aria-current');
     }
   });
+}
+
+function getPath(){
+  const pathname = window.location.pathname || '/';
+  const normalized = pathname.replace(/\/+$/, '');
+  return normalized || '/';
+}
+
+function resolveViewFromPath(path){
+  const normalized = String(path || '/').trim() || '/';
+  const withoutLeadingSlash = normalized.replace(/^\/+/, '');
+  if (!withoutLeadingSlash) return 'home';
+  return ROUTE_TO_VIEW[withoutLeadingSlash] || null;
 }
 
 function updateViewPath(viewName, options = {}){
@@ -6914,8 +6941,7 @@ function initResponsiveMenu(){
 function resolveViewFromLocation(){
   try {
     const url = new URL(window.location.href);
-    const pathname = (url.pathname || '/').replace(/^\/+|\/+$/g, '');
-    const pathView = pathname ? ROUTE_TO_VIEW[pathname] : 'home';
+    const pathView = resolveViewFromPath(getPath());
     if (pathView) {
       return {
         viewName: pathView,
@@ -6938,9 +6964,18 @@ function resolveViewFromLocation(){
   };
 }
 
+function route(path){
+  const normalizedPath = String(path || '/');
+  if (normalizedPath.startsWith('/api/') || normalizedPath.startsWith('/auth/')) {
+    return false;
+  }
+  const viewName = resolveViewFromPath(normalizedPath) || defaultViewName;
+  return navigateToView(viewName, { updateUrl: false });
+}
+
 function initDeepLink(){
   const { viewName, fromLegacyQuery } = resolveViewFromLocation();
-  const navigated = navigateToView(viewName, {
+  const navigated = route(getPath()) || navigateToView(viewName, {
     updateUrl: fromLegacyQuery,
     replaceHistory: true,
   });
@@ -6951,8 +6986,7 @@ function initDeepLink(){
 
 function initHistoryNavigation(){
   window.addEventListener('popstate', ()=>{
-    const { viewName } = resolveViewFromLocation();
-    if (!navigateToView(viewName, { updateUrl: false })) {
+    if (!route(getPath())) {
       navigateToView(defaultViewName, { updateUrl: false });
     }
   });

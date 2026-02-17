@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Use RewriteBase / somente se o app estiver em subdiretório no hosting.
+# RewriteBase /
+
+# Não reescreve arquivos e pastas reais
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Não reescreve rotas internas/servidor (APIs e pastas do backend)
+RewriteRule ^(api|auth|uploads|db|lib|tools|views|cmss|mechanics|mercadoPreditivo|mercados_lmsr)/ - [L]
+
+# Fallback da SPA: qualquer outra rota vai para index.html
+RewriteRule ^ index.html [L]
