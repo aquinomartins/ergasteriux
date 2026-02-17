@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="pt-br" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+  <title>Ergastério São Lucas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+<style>/* ====== Card base ====== */
+.pm-card{
+  --bg:#ffffff;
+  --ink:#111827;
+  --muted:#6b7280;
+  --line:#e5e7eb;
+
+  --up-bg:#e8f7ee;
+  --up-ink:#0f7a3d;
+
+  --down-bg:#fdecec;
+  --down-ink:#b42318;
+
+  --accent:#f59e0b; /* cor do ícone (BTC) */
+  --shadow: 0 10px 30px rgba(0,0,0,.10);
+
+  
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  padding: 14px 14px 12px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans";
+  color: var(--ink);
+}
+
+/* ====== Linha superior ====== */
+.pm-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+.pm-left{
+  display:flex;
+  align-items:flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pm-icon{
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 18%, #fff);
+  display:grid;
+  place-items:center;
+  color: #d97706;
+  font-weight: 800;
+  font-size: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, #fff);
+}
+
+.pm-title{min-width:0}
+.pm-name{
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: -.2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width: 250px;
+}
+
+/* ====== Gauge + meta ====== */
+.pm-right{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-shrink:0;
+}
+
+.pm-gauge{
+  --size: 52px;
+  --thick: 7px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 999px;
+  position: relative;
+
+  /* arco: 0..100 */
+  background:
+    conic-gradient(#22c55e calc(var(--p)*1%), #e5e7eb 0);
+  -webkit-mask:
+    radial-gradient(farthest-side, transparent calc(100% - var(--thick)), #000 0);
+          mask:
+    radial-gradient(farthest-side, transparent calc(100% - var(--thick)), #000 0);
+}
+
+.pm-gauge-val{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.pm-gauge-meta{
+  display:flex;
+  flex-direction:column;
+  gap: 2px;
+  align-items:flex-start;
+  margin-top: 2px;
+}
+
+.pm-gauge-dir{
+  font-size: 12px;
+  font-weight: 750;
+  color: #16a34a;
+  line-height: 1.1;
+}
+
+.pm-gauge-delta{
+  font-size: 12px;
+  font-weight: 750;
+  color: #ef4444;
+  line-height: 1.1;
+}
+
+/* ====== Ações Up/Down ====== */
+.pm-actions{
+  display:flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pm-btn{
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 12px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  cursor:pointer;
+  text-align:left;
+  user-select:none;
+}
+
+.pm-btn-label{
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: -.15px;
+}
+
+.pm-btn-pay{
+  font-weight: 800;
+  font-size: 13px;
+  white-space:nowrap;
+}
+
+.pm-btn-sub{
+  font-size: 12px;
+  font-weight: 800;
+  opacity: .95;
+  white-space:nowrap;
+}
+
+/* Up */
+.pm-up{
+  background: var(--up-bg);
+  color: var(--up-ink);
+  border-color: color-mix(in srgb, var(--up-ink) 18%, #fff);
+}
+.pm-up .pm-btn-pay{ color: #16a34a; }
+
+/* Down */
+.pm-down{
+  background: var(--down-bg);
+  color: var(--down-ink);
+  border-color: color-mix(in srgb, var(--down-ink) 16%, #fff);
+}
+.pm-down .pm-btn-pay{ color: #ef4444; }
+.pm-down .pm-btn-sub{ color: #ef4444; }
+
+/* Hover/active (leve, “polymarket feel”) */
+.pm-btn:hover{ filter: brightness(.99); transform: translateY(-1px); }
+.pm-btn:active{ transform: translateY(0); filter: brightness(.97); }
+
+/* ====== Rodapé ====== */
+.pm-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pm-live{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+}
+
+.pm-dot{
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background:#ef4444;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #ef4444 18%, #fff);
+}
+
+.pm-live-text{
+  font-weight: 850;
+  color:#ef4444;
+  letter-spacing:.3px;
+}
+
+.pm-vol{
+  color: var(--muted);
+}
+
+.pm-bookmark{
+  border: 1px solid var(--line);
+  background: #fff;
+  color: #9ca3af;
+  border-radius: 10px;
+  width: 32px;
+  height: 28px;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
+.pm-bookmark:hover{ color:#6b7280; }
+
+/* Card “Mercados LMSR” com variação sutil */
+.pm-card:has(.pm-btn[data-view="mercados_lmsr"]) {
+  background: linear-gradient(180deg, #f8fffb 0%, #ffffff 60%);
+  border-color: color-mix(in srgb, #10b981 24%, #d1fae5);
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.12);
+}
+
+.pm-card:has(.pm-btn[data-view="mercados_lmsr"]) .pm-icon {
+  background: color-mix(in srgb, #10b981 24%, #fff);
+  border-color: color-mix(in srgb, #10b981 38%, #fff);
+  color: #047857;
+}
+
+.pm-card:has(.pm-btn[data-view="mercados_lmsr"]) .pm-live-text {
+  color: #059669;
+}
+</style>
+<script>digitalData = {
+    "page": {
+        "category": [],
+        "pageInfo": {
+            "language": "pt-BR",
+            "country": "BR",
+            "publisher": "IBM Corporation",
+            "version": "v19",
+            "ibm": {
+                "contentDelivery": "Drupal 9",
+                "contentProducer": "2598578 - Page Builder",
+                "owner": "Peter Barros/White Plains/IBM",
+                "siteID": "DRUPAL",
+                "contactModuleConfiguration": {
+                    "contactInformationBundleKey": {
+                        "focusArea": "Miscellaneous - About IBM",
+                        "languageCode": "pt",
+                        "regionCode": "BR"
+                    },
+                    "contactModuleTranslationKey": {
+                        "languageCode": "pt",
+                        "regionCode": "BR"
+                    }
+                },
+                "config": {
+                    "masthead": {
+                        "type": "default"
+                    },
+                    "footer": {
+                        "type": "default"
+                    }
+                }
+            },
+            "publishDate": "2022-04-07",
+            "effectiveDate": "2021-03-08",
+            "expiryDate": "2026-04-07"
+        }
+    }
+}</script>
+<meta name="geo.country" content="BR" />
+<meta property="og:description" content="Colégio Modelo CMSS" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!--script data-title="Components design metadata">/*
+Leadspace: v19 - Module 5E - Leadspace (4E)
+
+Bands/Sections:
+1. v19 - Module 12A - russia_ceo_announcement
+2. v19 - Carousel Module 1B - Features (1B)
+3. v19 - Module 12A - launch-xforce-threat-intelligence
+4. v19 - Carousel Module 1B - Trials (1B)
+5. v19 - Carousel Module 2B - Products (2B)
+6. v19 - Module 11A (Double) - Content Spotlight (11A)
+
+*/</script-->
+<!--link rel="alternate" hreflang="en-af" href="https://www.ibm.com/af-en" />
+<link rel="alternate" hreflang="fr-dz" href="https://www.ibm.com/dz-fr" />
+<link rel="alternate" hreflang="pt-ao" href="https://www.ibm.com/ao-pt" />
+<link rel="alternate" hreflang="en-ai" href="https://www.ibm.com/ai-en" />
+<link rel="alternate" hreflang="en-ag" href="https://www.ibm.com/ag-en" />
+<link rel="alternate" hreflang="es-ar" href="https://www.ibm.com/ar-es" />
+<link rel="alternate" hreflang="en-aw" href="https://www.ibm.com/aw-en" />
+<link rel="alternate" hreflang="en-au" href="https://www.ibm.com/au-en" />
+<link rel="alternate" hreflang="de-at" href="https://www.ibm.com/at-de" />
+<link rel="alternate" hreflang="en-bs" href="https://www.ibm.com/bs-en" />
+<link rel="alternate" hreflang="en-bh" href="https://www.ibm.com/bh-en" />
+<link rel="alternate" hreflang="en-bd" href="https://www.ibm.com/bd-en" />
+<link rel="alternate" hreflang="en-bb" href="https://www.ibm.com/bb-en" />
+<link rel="alternate" hreflang="en-be" href="https://www.ibm.com/be-en" />
+<link rel="alternate" hreflang="en-bm" href="https://www.ibm.com/bm-en" />
+<link rel="alternate" hreflang="es-bo" href="https://www.ibm.com/bo-es" />
+<link rel="alternate" hreflang="en-bw" href="https://www.ibm.com/bw-en" />
+<link rel="alternate" hreflang="pt-br" href="https://www.ibm.com/br-pt" />
+<link rel="alternate" hreflang="en-vg" href="https://www.ibm.com/vg-en" />
+<link rel="alternate" hreflang="en-bn" href="https://www.ibm.com/bn-en" />
+<link rel="alternate" hreflang="en-bg" href="https://www.ibm.com/bg-en" />
+<link rel="alternate" hreflang="fr-bf" href="https://www.ibm.com/bf-fr" />
+<link rel="alternate" hreflang="en-kh" href="https://www.ibm.com/kh-en" />
+<link rel="alternate" hreflang="fr-cm" href="https://www.ibm.com/cm-fr" />
+<link rel="alternate" hreflang="en-ca" href="https://www.ibm.com/ca-en" />
+<link rel="alternate" hreflang="fr-ca" href="https://www.ibm.com/ca-fr" />
+<link rel="alternate" hreflang="en-ky" href="https://www.ibm.com/ky-en" />
+<link rel="alternate" hreflang="fr-td" href="https://www.ibm.com/td-fr" />
+<link rel="alternate" hreflang="es-cl" href="https://www.ibm.com/cl-es" />
+<link rel="alternate" hreflang="zh-cn" href="https://www.ibm.com/cn-zh" />
+<link rel="alternate" hreflang="es-co" href="https://www.ibm.com/co-es" />
+<link rel="alternate" hreflang="fr-cd" href="https://www.ibm.com/cd-fr" />
+<link rel="alternate" hreflang="fr-cg" href="https://www.ibm.com/cg-fr" />
+<link rel="alternate" hreflang="es-cr" href="https://www.ibm.com/cr-es" />
+<link rel="alternate" hreflang="en-hr" href="https://www.ibm.com/hr-en" />
+<link rel="alternate" hreflang="en-cw" href="https://www.ibm.com/cw-en" />
+<link rel="alternate" hreflang="en-cy" href="https://www.ibm.com/cy-en" />
+<link rel="alternate" hreflang="en-cz" href="https://www.ibm.com/cz-en" />
+<link rel="alternate" hreflang="en-dm" href="https://www.ibm.com/dm-en" />
+<link rel="alternate" hreflang="en-dk" href="https://www.ibm.com/dk-en" />
+<link rel="alternate" hreflang="es-ec" href="https://www.ibm.com/ec-es" />
+<link rel="alternate" hreflang="en-eg" href="https://www.ibm.com/eg-en" />
+<link rel="alternate" hreflang="en-ee" href="https://www.ibm.com/ee-en" />
+<link rel="alternate" hreflang="en-et" href="https://www.ibm.com/et-en" />
+<link rel="alternate" hreflang="en-fi" href="https://www.ibm.com/fi-en" />
+<link rel="alternate" hreflang="fr-fr" href="https://www.ibm.com/fr-fr" />
+<link rel="alternate" hreflang="fr-ga" href="https://www.ibm.com/ga-fr" />
+<link rel="alternate" hreflang="de-de" href="https://www.ibm.com/de-de" />
+<link rel="alternate" hreflang="en-gh" href="https://www.ibm.com/gh-en" />
+<link rel="alternate" hreflang="en-gr" href="https://www.ibm.com/gr-en" />
+<link rel="alternate" hreflang="en-gd" href="https://www.ibm.com/gd-en" />
+<link rel="alternate" hreflang="en-gy" href="https://www.ibm.com/gy-en" />
+<link rel="alternate" hreflang="en-hk" href="https://www.ibm.com/hk-en" />
+<link rel="alternate" hreflang="en-hu" href="https://www.ibm.com/hu-en" />
+<link rel="alternate" hreflang="en-in" href="https://www.ibm.com/in-en" />
+<link rel="alternate" hreflang="en-id" href="https://www.ibm.com/id-en" />
+<link rel="alternate" hreflang="en-iq" href="https://www.ibm.com/iq-en" />
+<link rel="alternate" hreflang="en-ie" href="https://www.ibm.com/ie-en" />
+<link rel="alternate" hreflang="en-il" href="https://www.ibm.com/il-en" />
+<link rel="alternate" hreflang="it-it" href="https://www.ibm.com/it-it" />
+<link rel="alternate" hreflang="fr-ci" href="https://www.ibm.com/ci-fr" />
+<link rel="alternate" hreflang="en-jm" href="https://www.ibm.com/jm-en" />
+<link rel="alternate" hreflang="ja-jp" href="https://www.ibm.com/jp-ja" />
+<link rel="alternate" hreflang="en-jo" href="https://www.ibm.com/jo-en" />
+<link rel="alternate" hreflang="en-kz" href="https://www.ibm.com/kz-en" />
+<link rel="alternate" hreflang="en-ke" href="https://www.ibm.com/ke-en" />
+<link rel="alternate" hreflang="ko-kr" href="https://www.ibm.com/kr-ko" />
+<link rel="alternate" hreflang="en-kw" href="https://www.ibm.com/kw-en" />
+<link rel="alternate" hreflang="en-lv" href="https://www.ibm.com/lv-en" />
+<link rel="alternate" hreflang="en-lb" href="https://www.ibm.com/lb-en" />
+<link rel="alternate" hreflang="en-ly" href="https://www.ibm.com/ly-en" />
+<link rel="alternate" hreflang="en-lt" href="https://www.ibm.com/lt-en" />
+<link rel="alternate" hreflang="fr-mg" href="https://www.ibm.com/mg-fr" />
+<link rel="alternate" hreflang="en-mw" href="https://www.ibm.com/mw-en" />
+<link rel="alternate" hreflang="en-my" href="https://www.ibm.com/my-en" />
+<link rel="alternate" hreflang="fr-mu" href="https://www.ibm.com/mu-fr" />
+<link rel="alternate" hreflang="es-mx" href="https://www.ibm.com/mx-es" />
+<link rel="alternate" hreflang="en-ms" href="https://www.ibm.com/ms-en" />
+<link rel="alternate" hreflang="fr-ma" href="https://www.ibm.com/ma-fr" />
+<link rel="alternate" hreflang="pt-mz" href="https://www.ibm.com/mz-pt" />
+<link rel="alternate" hreflang="en-na" href="https://www.ibm.com/na-en" />
+<link rel="alternate" hreflang="en-np" href="https://www.ibm.com/np-en" />
+<link rel="alternate" hreflang="en-nl" href="https://www.ibm.com/nl-en" />
+<link rel="alternate" hreflang="en-nz" href="https://www.ibm.com/nz-en" />
+<link rel="alternate" hreflang="fr-ne" href="https://www.ibm.com/ne-fr" />
+<link rel="alternate" hreflang="en-ng" href="https://www.ibm.com/ng-en" />
+<link rel="alternate" hreflang="en-no" href="https://www.ibm.com/no-en" />
+<link rel="alternate" hreflang="en-om" href="https://www.ibm.com/om-en" />
+<link rel="alternate" hreflang="en-pk" href="https://www.ibm.com/pk-en" />
+<link rel="alternate" hreflang="es-py" href="https://www.ibm.com/py-es" />
+<link rel="alternate" hreflang="es-pe" href="https://www.ibm.com/pe-es" />
+<link rel="alternate" hreflang="en-ph" href="https://www.ibm.com/ph-en" />
+<link rel="alternate" hreflang="pl-pl" href="https://www.ibm.com/pl-pl" />
+<link rel="alternate" hreflang="en-pt" href="https://www.ibm.com/pt-en" />
+<link rel="alternate" hreflang="en-qa" href="https://www.ibm.com/qa-en" />
+<link rel="alternate" hreflang="en-ro" href="https://www.ibm.com/ro-en" />
+<link rel="alternate" hreflang="ru-ru" href="https://www.ibm.com/ru-ru" />
+<link rel="alternate" hreflang="en-kn" href="https://www.ibm.com/kn-en" />
+<link rel="alternate" hreflang="en-lc" href="https://www.ibm.com/lc-en" />
+<link rel="alternate" hreflang="en-vc" href="https://www.ibm.com/vc-en" />
+<link rel="alternate" hreflang="ar-sa" href="https://www.ibm.com/sa-ar" />
+<link rel="alternate" hreflang="en-sa" href="https://www.ibm.com/sa-en" />
+<link rel="alternate" hreflang="fr-sn" href="https://www.ibm.com/sn-fr" />
+<link rel="alternate" hreflang="en-rs" href="https://www.ibm.com/rs-en" />
+<link rel="alternate" hreflang="fr-sc" href="https://www.ibm.com/sc-fr" />
+<link rel="alternate" hreflang="en-sl" href="https://www.ibm.com/sl-en" />
+<link rel="alternate" hreflang="en-sg" href="https://www.ibm.com/sg-en" />
+<link rel="alternate" hreflang="en-sk" href="https://www.ibm.com/sk-en" />
+<link rel="alternate" hreflang="en-si" href="https://www.ibm.com/si-en" />
+<link rel="alternate" hreflang="en-za" href="https://www.ibm.com/za-en" />
+<link rel="alternate" hreflang="es-es" href="https://www.ibm.com/es-es" />
+<link rel="alternate" hreflang="en-lk" href="https://www.ibm.com/lk-en" />
+<link rel="alternate" hreflang="en-sr" href="https://www.ibm.com/sr-en" />
+<link rel="alternate" hreflang="en-se" href="https://www.ibm.com/se-en" />
+<link rel="alternate" hreflang="fr-ch" href="https://www.ibm.com/ch-fr" />
+<link rel="alternate" hreflang="de-ch" href="https://www.ibm.com/ch-de" />
+<link rel="alternate" hreflang="zh-tw" href="https://www.ibm.com/tw-zh" />
+<link rel="alternate" hreflang="en-tz" href="https://www.ibm.com/tz-en" />
+<link rel="alternate" hreflang="en-th" href="https://www.ibm.com/th-en" />
+<link rel="alternate" hreflang="en-tt" href="https://www.ibm.com/tt-en" />
+<link rel="alternate" hreflang="fr-tn" href="https://www.ibm.com/tn-fr" />
+<link rel="alternate" hreflang="tr-tr" href="https://www.ibm.com/tr-tr" />
+<link rel="alternate" hreflang="en-ye" href="https://www.ibm.com/ye-en" />
+<link rel="alternate" hreflang="en-tc" href="https://www.ibm.com/tc-en" />
+<link rel="alternate" hreflang="en-ua" href="https://www.ibm.com/ua-en" />
+<link rel="alternate" hreflang="en-ug" href="https://www.ibm.com/ug-en" />
+<link rel="alternate" hreflang="ar-ae" href="https://www.ibm.com/ae-ar" />
+<link rel="alternate" hreflang="en-ae" href="https://www.ibm.com/ae-en" />
+<link rel="alternate" hreflang="en-gb" href="https://www.ibm.com/uk-en" />
+<link rel="alternate" hreflang="es-uy" href="https://www.ibm.com/uy-es" />
+<link rel="alternate" hreflang="en-uz" href="https://www.ibm.com/uz-en" />
+<link rel="alternate" hreflang="es-ve" href="https://www.ibm.com/ve-es" />
+<link rel="alternate" hreflang="en-vn" href="https://www.ibm.com/vn-en" />
+<link rel="alternate" hreflang="en-zm" href="https://www.ibm.com/zm-en" />
+<link rel="alternate" hreflang="en-zw" href="https://www.ibm.com/zw-en" />
+<link rel="revision" href="https://www.ibm.com/br-pt" /-->
+
+    <title>CMSS - Colégio Modelo São Sebastião</title>
+    
+    
+    <link href="cmss/estilos/www.css" rel="preload" as="style"  />
+    <link rel="stylesheet" href="cmss/estilos/www.css" media="all" />
+
+<link rel="preload" href="fonts/ibmplexsans-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/ibmplexsans-regularitalic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/ibmplexsans-semibold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/icons-ibm-v12.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="fonts/ibmplexsans-light.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" media="all" href="cmss/estilos/www2.css" />
+<link rel="stylesheet" media="all" href="cmss/estilos/fgx0.css" />
+<link rel="stylesheet" media="all" href="cmss/estilos/mxk5.css" />
+
+    <!--script src="//1.www.s81c.com/common/stats/ibm-common.js"></script-->
+<script src="cmss/scripts/www.js" defer></script>
+<!--script src="//1.www.s81c.com/common/carbon/plex/load-non-latin-plex.js" defer></script>
+<!--script src="//1.www.s81c.com/common/v19a/js/www.js" defer></script-->
+
+    <!--noscript>
+      <link rel="stylesheet" type="text/css" href="//1.cms.s81c.com/modules/contrib/hc_fractal/dist/css/no-js.css" />
+    </noscript-->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+  <body id="ibm-com"  uuid="13191044-6a14-4729-9e45-bd694fad7d27" class="path-node page-node-type-page-wrapper ibm-type">
+      
+      <header class="menu site-header" id="appMenu">
+    <div class="menu-top">
+
+      <div class="menu-actions">
+        <div class="menu-brand">
+        <div class="menu-logo" data-view="home" href="#">
+  <!--img src="uploads/logoErgasterio.svg" alt="Logo Ergastério São Lucas"-->
+  <span>Ergastério São Lucas</span>
+</div>
+        <!--span class="menu-tagline">Hub de leilões e ativos digitais</span-->
+      </div>
+        
+        <div class="menu-brand"><button class="auth-trigger" id="authOverlayButton" type="button">Entrar</button></div>
+        <div id="authBoxAnchor">
+          <div id="authBox" class="card">
+            <!-- Login -->
+            <form id="loginForm">
+              <input type="email" id="email" placeholder="email" required />
+              <input type="password" id="password" placeholder="senha" required />
+              <button type="submit">Entrar</button>
+            </form>
+
+            <!-- Sessão ativa -->
+            <div id="loggedBox" style="display:none">
+              <p class="ok" id="sessionInfo">Conectado</p>
+              <button id="logoutBtn">Sair</button>
+            </div>
+
+            <hr/>
+
+            <!-- Toggle Registro -->
+            <button id="toggleRegister" class="ghost">Registrar novo usuário</button>
+            <form id="registerForm" style="display:none; margin-top:8px;">
+              <input type="text" id="r_name" placeholder="nome" required />
+              <input type="email" id="r_email" placeholder="email" required />
+              <input type="tel" id="r_phone" placeholder="telefone com DDD (opcional)" />
+              <input type="password" id="r_password" placeholder="senha" required />
+              <button type="submit">Criar conta</button>
+            </form>
+            <p id="authMsg" class="msg"></p>
+          </div>
+        </div>
+        <!--div class="menu-brand"><span class="menu-actions__icon" aria-hidden="true">🔎</span></div-->
+      </div>
+    </div>
+
+    <div class="menu-content2" id="menuContent">
+      <nav class="menu-nav" aria-label="Navegação principal">
+        <ul>
+          <li><a href="#" data-view="home" aria-current="page">Home</a></li>
+          <li><a href="#" data-view="trending">Trending</a></li>
+          <li><a href="#" data-view="mechanics">Mecânica Unificada</a></li>
+          <li><a href="#" data-view="live_market">Mercado ao vivo</a></li>
+          <li><a href="#" data-view="mercado_preditivo">Mercado preditivo</a></li>
+          <li><a href="#" data-view="collections">Coleções</a></li>
+          <li><a href="#" data-view="auctions">Leilões</a></li>
+          <li><a href="#" data-view="events">Eventos</a></li>
+          <li><a href="#" data-view="user_assets">Meus Ativos</a></li>
+          <li><a href="#" data-view="pending_transactions">Transações pendentes</a></li>
+          <li><a href="#" data-view="liquidity_game">Simulador</a></li>
+          <li><a href="#" data-view="mercados_lmsr">Mercados LMSR</a></li>
+          <li><a href="#" data-view="materiais">Materiais</a></li>
+          <li class="admin-only"><a href="#" data-view="admin">Painel Administrativo</a></li>
+          <li class="admin-only"><a href="#" data-view="admin_mint">Mint de NFT</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+    
+      <div class="dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
+    <div id="ibm-top" class="ibm-landing-page">
+    <div class="region region-masthead">
+    
+
+    
+    
+
+<!--div id="ibm-masthead" role="banner" aria-label="IBM" data-mhtype="alternate" class="simple  ibm-mhtype-alternate">
+  <div id="ibm-universal-nav" style="background-color: #1c9cd8">
+    <!--nav role="navigation" aria-label="IBM">
+      <div id="ibm-home"><a href="https://www.gemnio.com">GEMNIO</a></div>
+      
+      <div id="ibm-home"><img loading="lazy" src="imagens/Prancheta 1a.png" alt="Colégio Modelo São Sebastião - CMSS"
+        class=""
+  ></div>
+                    <Menu>
+              
+              <ul aria-label="" role="toolbar" class="ibm-masthead-categories">
+
+              </ul>
+      
+      <ul id="ibm-menu-links" role="toolbar" aria-label="Site map">
+        <li><a href="https://www.ibm.com/sitemap/br/pt">Mapa do sítio</a></li>
+      </ul>
+    </nav>
+
+          <!--div id="ibm-search-module" role="search" aria-labelledby="ibm-masthead">
+        <form id="ibm-search-form" action="https://www.ibm.com/Search/" method="get">
+          <p>
+            <label for="q">IBM</label>
+            <input type="text" maxlength="100" value="" placeholder=Procurar name="q" id="q" aria-label="Search"/>
+            <input type="hidden" value="18" name="v"/>
+            <input type="hidden" value="utf" name="en"/>
+            <input type="hidden" value="pt" name="lang"/>
+            <input type="hidden" value="br" name="cc"/>
+            <input type="submit" id="ibm-search" class="ibm-btn-search" value="Submit"/>
+          </p>
+        </form>
+      </div>
+    
+
+  </div> 
+  </div>
+
+  </div-->
+
+  <div id="ibm-content-wrapper">
+      <header  aria-label="Navigation Header">
+        
+
+  </header>
+
+
+
+      <div class="region region-help">
+    <div data-drupal-messages-fallback class="hidden"></div>
+
+  </div>
+
+      <div class="region region-content">
+    <div id="block-ibm-duo-content">
+  
+
+<!--AQUI imagem principal-->
+  <section  role="article" about="/br-pt/node/2598576" class="ibm-duo-leadspace ibm-duo-leadspace-large ibm-background-gray-10" data-bg-lazy-load>
+      <div id="spa-view" class="landing-view" data-default-view="auctions"></div>
+    <!--div class="ibm-grid-container ibm-duo-leadspace-large__container">
+        
+      <!--div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16 ibm-grid-col-seamless ibm-duo-leadspace-large__bg">
+
+                  <div class="picturefill-background ibm-duo-leadspace-large__image ani-reveal ani-fadeIn">
+            <span data-src="imagens/comunicaInicial.webp"></span>
+            <span data-src="imagens/comunicaInicialMobile.webp" data-media="(min-width: 320px)"></span>
+            <span data-src="imagens/comunicaInicial.webp" data-media="(min-width: 672px)"></span>
+          </div>
+        
+              </div>
+
+      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-7 ibm-duo-leadspace-large__content">
+                  <div class="ibm-grid-col-sm-4-3 ibm-grid-col-lg-16-12 ibm-grid-col-xlg-16-16 ibm-grid-col-seamless ibm-mb-4 ibm-duo-leadspace-large__headline ani-reveal ani-fadeInUp" data-wow-delay=".2s">
+            <h1 class="bx--type-expressive-heading-05 bx--type-light ibm-textcolor-gray-90 ibm-pb-0 ibm-mb-0">
+                  <span>Colégio Modelo São Sebastião - CMSS</span>
+
+            </h1>
+          </div>
+        
+        <div class="ibm-duo-leadspace-large__subhead">
+                      <div class="ibm-grid-col-sm-4-3 ibm-grid-col-lg-16-10 ibm-grid-col-xlg-16-12 ibm-grid-col-seamless ani-reveal ani-fadeInUp" data-wow-delay=".4s">
+              <p class="bx--type-expressive-heading-04 ibm-textcolor-gray-70 ibm-mb-0">
+                    <span>O Modelo de Sucesso à sua frente!</span>
+
+              </p>
+            </div>
+          
+            
+            <div class="ibm-btn-row ibm-button-link ibm-mt-4 ani-reveal ani-fadeInUp" data-wow-delay=".6s">
+          
+
+        
+  
+  
+  
+
+
+
+
+        
+  <div class='ibm-duo-button-item'>
+    <a  target="_self" href="http://www.colegiomodelocmss.com.br/#" class="ibmibm.com/br-pt/productcta ibm-duo-u--link-icon">
+      Participe do nosso programa de Bolsas de Estudos!
+      
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+    </a>
+  </div>
+
+      </div>
+  <div class="ibm-grid-col-sm-4-4 ani-reveal ani-fadeInUp" data-wow-delay=".7s">
+      </div>
+
+          
+        </div>
+      </div>
+
+      <div class="ibm-grid-col-sm-4-1 ibm-grid-col-md-8-0 ibm-grid-col-lg-16-1"></div>
+
+      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-8 ibm-grid-col-xlg-16-8 ibm-grid-col-seamless ibm-duo-leadspace-large__media-full">
+              </div>
+    </div-->
+  </section>
+
+<main role="main" aria-labelledby="ibm-pagetitle-h1">
+  <div id="ibm-pcon">
+    <div id="ibm-content">
+      <div id="ibm-content-body" class="ibm-padding-top-0">
+        <div id="ibm-content-main">
+          
+                    
+          <div class="node__content">
+                                                
+
+  
+
+
+
+
+
+  <section  style="background-color: #f9eb1e" role="article" about="/br-pt/node/3081420" id="3081420" class="ibm-duo-band ibm-duo-module-12a ibm-background-gray-100" data-bg-lazy-load>
+    
+                      
+
+  
+
+
+
+
+
+<div class="ibm-grid-container ibm-duo-u--pt-4 ibm-duo-u--pb-4 ">
+  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-8 ibm-duo-module-12a__content">
+    
+          <!--div class="ibm-duo-module-10a__subhead ibm-textcolor-gray-100">
+                    <p>Faça a diferença!<br />
+ texto texto texto texto</p>
+      
+      </div-->
+    
+      </div>
+
+  
+    <div class="ibm-grid-col-sm-4-0 ibm-grid-col-md-8-2 ibm-grid-col-lg-16-4"></div>
+          <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-4 ibm-duo-module-12a__cta ani-reveal ani-fadeInUp">
+                  
+
+        
+  
+  
+  
+
+
+
+
+        
+  <div class='ibm-duo-button-item'>
+
+
+    <a  target="_self" href="http://www.colegiomodelocmss.com.br/#" class="ibm-btn-pri ibm-duo-btn-cta ibm-duo-u--link-icon">
+      Acesse o Calendário Semestral
+      
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+    </a>
+  </div>
+
+              </div>
+      </div>
+
+
+              </section>
+
+              
+
+
+
+
+
+
+  <section  role="article" about="/br-pt/node/2598600" id="2598600" class="ibm-duo-band ibm-duo-module-1b ibm-duo-u--pt-4 ibm-duo-u--pb-4 ibm-background-white-core" data-bg-lazy-load>
+    <div class="ibm-grid-container ibm-duo-module-1b__container">
+      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-4">
+        
+
+  <div class="ibm-duo-heading__headline ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-8 ibm-grid-col-seamless ibm-mb-3 ani-reveal ani-fadeInUp">
+    <h2 class="bx--type-productive-heading-05 ibm-textcolor-gray-90 ibm-pb-0 ibm-mb-0">
+          <span > Níveis de Ensino</span>
+
+    </h2>
+  </div>
+
+
+      </div>
+
+      
+                                
+        
+        <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-12 ibm-grid-col-seamless">
+          <div class="ibm-duo-carousel ibm-duo-carousel__1b ani-reveal ani-fadeInUp" data-widget="setsameheight" data-always="true" data-items=".ibm-duo-card__heading">
+
+          <button type="button" class="slick-arrow slick-prev" data-ibm-cm-avoid="true">
+      <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" aria-label="Show previous content"><path d="m10 16l10-10l1.4 1.4l-8.6 8.6l8.6 8.6l-1.4 1.4l-10-10z" /></svg>
+</button>
+
+          
+                      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="#" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-cool-gray-10 ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="imagens/data-fabric-five-levers-444x254.jpg" alt="arquitetura data fabric usada na indústria alimentícia"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > Educação Infantil</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p> As crianças têm o primeiro contato com a investigação e a criação, habilidades que acompanharão toda a sua trajetória. Nosso jeito de ensinar parte do princípio de que os conhecimentos são construídos, aprofundados e ampliados simultaneamente à cada experiência interativa. Esses são os caminhos para uma aprendizagem ainda mais significativa.</p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Veja os espaços dedicados às crianças</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div>
+                      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="#" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-cool-gray-10 ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="imagens/cloud-five-levers-444x254.jpg" alt="pessoas trabalhando para simplificar infraestrutura de TI"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > EF - Anos Iniciais</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>Do 1º ao 5º Ano do Ensino Fundamental - 7 a 11 anos de idade. Os alunos exploraram valores e linguagens, ampliando sua compreensão intelectual, artística e cultural. Nossa proposta pedagógica é o ponto de partida para que os alunos mostrem sua voz, debatam diferentes assuntos e construam um posicionamento crítico sobre mundo a sua volta.</p>
+
+<p> </p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Conheça nossos laboratórios</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div>
+                      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="#" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-cool-gray-10 ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="imagens/consulting-five-levers-444x254.jpg" alt="consultoria empresarial com consultor de IBM consulting"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > EF - Anos Finais</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>Do 6º ao 9º Ano do Ensino Fundamental, o aluno é ainda mais instigado a expressar suas ideias e aprender a lidar com desafios de maior complexidade. Essa nova jornada é marcada pelo forte vínculo entre alunos e educadores, incentivando o protagonismo dos estudantes no próprio processo de aprendizado. Assim, fortalecemos a autonomia e oferecemos a preparação completa para realizar grandes conquistas.</p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Leia aqui nossa proposta pedagógica</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div>
+                      <!--div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="https://www.ibm.com/cloud/br-pt/aiops/" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-cool-gray-10 ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="//1.cms.s81c.com/sites/default/files/2022-02-14/automate-five-levers-444x254.jpg" alt="automação empresarial com AIOPS"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > Coloque seus aplicativos no piloto automático</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>Empresas que investem em AIOps e automação cortam gastos em até 50%.</p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Veja como acelerar a transformação digital</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div-->
+                      <!--div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="https://www.ibm.com/about/br-pt/secure-your-business/" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-cool-gray-10 ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="//1.cms.s81c.com/sites/default/files/2022-02-14/security-five-levers-444x254.jpg" alt="segurança cibernética e segurança de dados com profissional de IBM security"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > Nunca confie, sempre verifique</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>A segurança preditiva pode evitar violações de dados onerosas.</p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Siga em frente com a estratégia zero trust</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div-->
+          
+            <span class="ibm-duo-carousel__counter ibm-duo-carousel__counter--5 bx--type-body-long-01 ibm-mb-1 ibm-textcolor-gray-90"></span>
+
+            <button type="button" class="slick-arrow slick-next" data-ibm-cm-avoid="true">
+      <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" aria-label="Show next content"><polygon points="22,16 12,26 10.6,24.6 19.2,16 10.6,7.4 12,6"></polygon></svg>
+</button>
+          </div>
+        </div>
+      
+    </div>
+  </section>
+
+              
+
+  
+
+
+
+
+
+  <section role="article" about="/br-pt/node/3072619" id="3072619" class="ibm-duo-band ibm-duo-module-12a ibm-background-gray-100" style="background-color: #37475a">
+    
+                      
+
+  
+
+
+
+
+
+<div class="ibm-grid-container ibm-duo-u--pt-4 ibm-duo-u--pb-4 ">
+  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-8 ibm-duo-module-12a__content">
+          <h2 class="ibm-duo-module-12a__headline bx--type-semibold bx--type-productive-heading-04 ibm-mb-0 ibm-pb-0 ibm-textcolor-gray-10">
+            <span > Sistema Escola Web CMSS</span>
+
+      </h2>
+    
+          <div class="ibm-duo-module-12a__subhead ibm-textcolor-gray-10">
+                    <p>Acesse aqui a plataforma!</p>
+      
+      </div>
+    
+      </div>
+
+  
+    <div class="ibm-grid-col-sm-4-0 ibm-grid-col-md-8-2 ibm-grid-col-lg-16-4"></div>
+          <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-4 ibm-duo-module-12a__cta ani-reveal ani-fadeInUp">
+                  
+
+        
+  
+  
+  
+
+
+
+
+        
+  <div class='ibm-duo-button-item'>
+    <a  target="_self" href="#" class="ibm-btn-pri ibm-duo-btn-cta ibm-duo-u--link-icon">
+      Acesse Agora
+      
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+    </a>
+  </div>
+
+                  
+
+        
+  
+  
+  
+
+
+
+
+        
+  <div class='ibm-duo-button-item'>
+    <a  target="_self" href="#" class="ibm-btn-sec ibm-duo-btn-cta ibm-duo-u--link-icon ibm-btn-sec--white">
+      Faça download do Guia de Acesso (2,3MB)
+      
+    
+        
+
+                      <svg class="ibm-duo-u--icon--pdf" width="16" height="16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" aria-label="Download this PDF"></path><g fill="#000" fill-rule="nonzero"><path d="M16 9.143V8h-3.429v5.714h1.143V11.43h1.715v-1.143h-1.715V9.143zM9.714 13.714H7.43V8h2.285a1.716 1.716 0 011.715 1.714V12a1.716 1.716 0 01-1.715 1.714zm-1.143-1.143h1.143a.572.572 0 00.572-.571V9.714a.572.572 0 00-.572-.571H8.571v3.428zM5.143 8H2.286v5.714h1.143V12h1.714c.63 0 1.142-.512 1.143-1.143V9.143C6.285 8.512 5.774 8 5.143 8zm-1.714 2.857V9.143h1.714v1.714H3.43z"/><path d="M11.429 6.857V4.571a.52.52 0 00-.172-.4l-4-4a.52.52 0 00-.4-.171H1.143A1.146 1.146 0 000 1.143v13.714C0 15.488.512 16 1.143 16h9.143v-1.143H1.143V1.143h4.571V4.57c.002.63.513 1.141 1.143 1.143h3.429v1.143h1.143zM6.857 4.571v-3.2l3.2 3.2h-3.2z"/></g></svg>
+          
+    
+    </a>
+  </div>
+
+              </div>
+      </div>
+
+
+              </section>
+
+              
+
+
+
+
+
+
+  <section  role="article" about="/br-pt/node/2598712" id="2598712" class="ibm-duo-band ibm-duo-module-1b ibm-duo-u--pt-4 ibm-duo-u--pb-4 ibm-background-cool-gray-10" data-bg-lazy-load>
+    <div class="ibm-grid-container ibm-duo-module-1b__container">
+      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-4">
+        
+
+  <div class="ibm-duo-heading__headline ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-8 ibm-grid-col-seamless ibm-mb-3 ani-reveal ani-fadeInUp">
+    <h2 class="bx--type-productive-heading-02 ibm-textcolor-gray-90 ibm-pb-0 ibm-mb-0">
+          <span > Conheça nossos Materiais Didáticos. Trabalhamos com os melhores Sistemas de Ensino do país.</span>
+
+    </h2>
+  </div>
+
+
+  <div class="ibm-duo-heading__cta ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-15 ibm-grid-col-seamless ibm-mt-3 ibm-mb-3 ani-reveal ani-fadeInUp">
+          
+
+        
+  
+  
+  
+
+
+
+  
+  
+  <p class='ibm-mb-0 ibm-duo-u--pr-2 ibm-pb-1'>
+    <a  target="_self" href="#" class="ibm-duo-u--link-icon ibm-textcolor-blue-60 ibm-duo-u--link-icon--rtl">
+      <span>Veja os materiais atualizados</span>
+      
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+    </a>
+  </p>
+
+
+      </div>
+      </div>
+
+      
+                                
+        
+        <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-12 ibm-grid-col-seamless">
+          <div class="ibm-duo-carousel ibm-duo-carousel__1b ani-reveal ani-fadeInUp" data-widget="setsameheight" data-always="true" data-items=".ibm-duo-card__heading">
+
+          <button type="button" class="slick-arrow slick-prev" data-ibm-cm-avoid="true">
+      <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" aria-label="Show previous content"><path d="m10 16l10-10l1.4 1.4l-8.6 8.6l8.6 8.6l-1.4 1.4l-10-10z" /></svg>
+</button>
+
+          
+                      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="https://sistemafb.com.br/ja-sou-sfb/" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-white-core ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="imagens/data_merch_444x254.webp" alt="cloud pak for data para análise de dados empresariais"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > Sistema Farias Brito</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>O SFB traz em seu DNA o padrão de excelência da união entre duas gigantes da educação brasileira: a Editora Moderna (que faz parte da Santillana, um dos maiores grupos de educação do mundo) e a Organização Educacional Farias Brito</p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Conheça mais o SFB</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div>
+                      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="https://www.sistemadeensinosucesso.com.br/" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-white-core ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="imagens/IBM_Z_Card.webp" alt="servidores para nuvem privada IBM Z"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > Sucesso Sistema de Ensino</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>O Sucesso Sistema de Ensino é uma parceria entre a Distribuidora de Edições Pedagógicas, as escolas adotantes e a comunidade. Temos como maior objetivo a promoção do conhecimento e de valores para a vida.</p>
+
+<p> </p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Acesse a plataforma</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div>
+                      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="https://www.standfor.com.br/" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-white-core ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="imagens/experience_merch_444x254.webp" alt="consultoria para melhoria da experiencia do cliente"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > Sistema StandFor</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>As melhores soluções e o apoio total para quem ensina e quem aprende Inglês. StandFor é o selo de ELT (English Language Teaching) da FTD Educação que oferece as melhores soluções e o apoio total para quem ensina e quem aprende Inglês.</p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Conheça os materiais de Inglês</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div>
+                      <!--div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="https://www.ibm.com/br-pt/cloud/turbonomic" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-white-core ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="//1.cms.s81c.com/sites/default/files/2022-02-16/automate_merch_444x254.jpg" alt="automação empresarial de TI com AIOPS"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > Aumente a produtividade de TI</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>Ofereça melhores experiências para os usuários finais permitindo um desempenho continuo.</p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Conheça a demo</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div-->
+                      <!--div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-1b__item">
+                  
+
+
+
+
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-duo-card--auto-height ibm-card--noborder ibm-mb-0">
+
+  
+        
+
+        
+  
+  
+  
+
+
+
+    <a  target="_self" href="https://www.ibm.com/br-pt/qradar" class="ibm-blocklink ibm-duo-card__link ibm-duo-u--link-icon--rtl ibm-background-white-core ibm-duo-card--hover-light">
+    
+          <div class="ibm-card__image ibm-duo-card__image ibm-duo-u--ratio--sixteen-nine">
+                  
+
+<img loading="lazy" src="//1.cms.s81c.com/sites/default/files/2022-02-16/security_merch_444x254.png" alt="ibm security qradar para segurança cibernética"
+        class=""
+  />
+        
+                                                      </div>
+    
+    <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container ibm-pb-3">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-duo-card__heading">
+            <h3 class="bx--type-productive-heading-02 ibm-type-semibold ibm-mb-1 ibm-textcolor-gray-90 ibm-pb-0">
+                  <span > IBM Security QRadar XDR</span>
+
+            </h3>
+          </div>
+        
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-14 ibm-duo-card__desc">
+            <div class="ibm-card__subheading bx--type-body-short-02 ibm-mb-0 ibm-textcolor-gray-70 ibm-pb-0">
+                          <p>A solução de detecção e resposta a ameaças mais aberta e completa do setor.</p>
+      
+            </div>
+          </div>
+              </div>
+    </div>
+
+          <div class="ibm-card__bottom ibm-duo-card__bottom">
+          <div class="ibm-grid-container">
+            <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-16">
+                                          
+
+        
+  
+  
+  
+
+
+
+    <p class="ibm-duo-u--link-icon ibm-textcolor-blue-60">
+    <span class="ibm-textcolor-blue-60">Acesse a prova do QRadar</span>
+    
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+  </p>
+
+            </div>
+          </div>
+      </div>
+    
+  
+  </a>
+
+    </div>
+
+
+              </div-->
+          
+            <span class="ibm-duo-carousel__counter ibm-duo-carousel__counter--5 bx--type-body-long-01 ibm-mb-1 ibm-textcolor-gray-90"></span>
+
+            <button type="button" class="slick-arrow slick-next" data-ibm-cm-avoid="true">
+      <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" aria-label="Show next content"><polygon points="22,16 12,26 10.6,24.6 19.2,16 10.6,7.4 12,6"></polygon></svg>
+</button>
+          </div>
+        </div>
+      
+    </div>
+  </section>
+
+              
+
+
+
+
+
+
+  <!--section  role="article" about="/br-pt/node/2725178" id="2725178" class="ibm-duo-band ibm-duo-module-2b ibm-duo-u--pt-4 ibm-duo-u--pb-4 ibm-background-white-core" data-bg-lazy-load>
+    <div class="ibm-grid-container ibm-duo-module-2b__container">
+
+      <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-4">
+        
+
+  <div class="ibm-duo-heading__headline ibm-grid-col-sm-4-4 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-8 ibm-grid-col-seamless ibm-mb-3 ani-reveal ani-fadeInUp">
+    <h2 class="bx--type-productive-heading-02 ibm-textcolor-gray-90 ibm-pb-0 ibm-mb-0">
+          <span > Conheça as tecnologias populares e de tendência</span>
+
+    </h2>
+  </div>
+
+
+      </div>
+
+      
+                                          
+        
+        <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-12 ibm-grid-col-seamless">
+          <div class="ibm-duo-carousel ibm-duo-carousel__2b ani-reveal ani-fadeInUp" data-widget="setsameheight" data-always="true" data-items=".ibm-duo-card__heading">
+
+                          <button type="button" class="slick-arrow slick-prev" data-ibm-cm-avoid="true">
+      <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" aria-label="Show previous content"><path d="m10 16l10-10l1.4 1.4l-8.6 8.6l8.6 8.6l-1.4 1.4l-10-10z" /></svg>
+</button>
+            
+            
+                          <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-2b__item">
+                    
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-card--noborder ibm-mb-0">
+
+  
+      <div class="ibm-blocklink ibm-duo-card__link ibm-background-cool-gray-10">
+          <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container">
+        <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-7 ibm-grid-col-lg-16-14 ibm-pb-4">
+          
+          
+          
+                      <div class="bx--type-body-long-02 ibm-textcolor-gray-70 ibm-mb-3 ibm-duo-card__desc">
+                          <p><strong>Ferramentas para desenvolvedores </strong><br />
+ </p>
+
+<ul><li><a href="https://developer.ibm.com/depmodels/cloud/?lnk=hpv18ct16">Recursos de Cloud Computing</a></li>
+	<li><a href="https://developer.ibm.com/technologies/artificial-intelligence?lnk=hpv18ct19">Recursos de Inteligência Artificial</a></li>
+	<li><a href="https://developer.ibm.com/?lnk=hpv18ct9">IBM Developer</a></li>
+	<li><a href="https://www.ibm.com/docs/en?lnk=hpv18ct14">Documentação</a></li>
+	<li><a data-entity-substitution="" data-entity-type="" data-entity-uuid="" href="https://www.redbooks.ibm.com/?lnk=ushpv18ct10">Redbooks</a></li>
+	<li><a href="https://www.ibm.com/support/home/?lnk=hpv18ct11">Suporte</a></li>
+	<li><a href="https://www.ibm.com/training/?lnk=hpv18ct15">Treinamento e habilidades</a></li>
+</ul>
+      
+            </div>
+                  </div>
+      </div>
+    </div>
+
+      
+    </div>
+  </div>
+
+
+                </div>
+                          <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-2b__item">
+                    
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-card--noborder ibm-mb-0">
+
+  
+      <div class="ibm-blocklink ibm-duo-card__link ibm-background-cool-gray-10">
+          <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container">
+        <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-7 ibm-grid-col-lg-16-14 ibm-pb-4">
+          
+          
+          
+                      <div class="bx--type-body-long-02 ibm-textcolor-gray-70 ibm-mb-3 ibm-duo-card__desc">
+                          <p><strong>Para negócios</strong><br />
+ </p>
+
+<p><strong>Ferramentas e Tecnologias</strong></p>
+
+<ul><li><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="d23b2635-fdf0-447c-9b6d-88f77069a596" href="/br-pt/cloud">Cloud</a></li>
+	<li><a href="https://www.ibm.com/br-pt/cloud/hybrid?lnk=hpv18pt14">Cloud Híbrida</a></li>
+	<li><a data-entity-substitution="" data-entity-type="" data-entity-uuid="" href="https://www.ibm.com/br-pt/analytics?lnk=hpv18pt1">Data Analytics</a></li>
+	<li><a data-entity-substitution="" data-entity-type="" data-entity-uuid="" href="https://www.ibm.com/br-pt/security?lnk=hpv18pt9">Segurança cibernética</a></li>
+	<li><a href="https://www.ibm.com/br-pt/watson?lnk=ushpv18pt17">IBM Watson</a></li>
+</ul><p><strong>Serviços</strong></p>
+
+<ul><li><a href="https://www.ibm.com/consulting/br-pt/">Consultoria Empresarial</a></li>
+	<li><a href="https://www.ibm.com/br-pt/garage?lnk=hpv18pt13">IBM Garage</a></li>
+</ul>
+      
+            </div>
+                  </div>
+      </div>
+    </div>
+
+      
+    </div>
+  </div>
+
+
+                </div>
+                          <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-duo-carousel__item ibm-duo-carousel-2b__item">
+                    
+
+
+
+
+
+<div class="ibm-card ibm-duo-card ibm-card--noborder ibm-mb-0">
+
+  
+      <div class="ibm-blocklink ibm-duo-card__link ibm-background-cool-gray-10">
+          <div class="ibm-card__content ibm-duo-card__content">
+      <div class="ibm-grid-container">
+        <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-7 ibm-grid-col-lg-16-14 ibm-pb-4">
+          
+          
+          
+                      <div class="bx--type-body-long-02 ibm-textcolor-gray-70 ibm-mb-3 ibm-duo-card__desc">
+                          <p><strong>Tecnologia</strong><br />
+ </p>
+
+<p><strong>Aprenda</strong></p>
+
+<ul><li><a data-entity-substitution="" data-entity-type="" data-entity-uuid="" href="https://www.ibm.com/br-pt/cloud/learn/cloud-computing">Saiba o que é Cloud Computing</a></li>
+	<li><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="c9276c19-3313-4781-bf51-9a6e3091eee0" href="/br-pt/cloud/learn/hybrid-cloud">Saiba o que é a Cloud Híbrida</a></li>
+	<li><a data-entity-substitution="" data-entity-type="" data-entity-uuid="" href="/cloud/learn/kubernetes?lnk=hpv18ct8">Saiba o que é Kubernetes</a></li>
+</ul><p><strong>Tendências</strong></p>
+
+<ul><li><a href="https://www.ibm.com/br-pt/cloud/redhat?lnk=hpv18ct13">Red Hat</a></li>
+	<li><a data-entity-substitution="canonical" data-entity-type="node" data-entity-uuid="66074c3f-554a-4d15-aa1a-11affb95f4a6" href="/br-pt/analytics/journey-to-ai">Inteligência artificial</a></li>
+	<li><a href="https://www.ibm.com/quantum-computing?lnk=hpv18ct18">Computação quântica</a></li>
+	<li><a href="https://www.ibm.com/br-pt/products/spss-statistics?lnk=ushpv18ct7">SPSS</a></li>
+	<li><a href="https://www.ibm.com/br-pt/blockchain?lnk=hpv18ct1">Blockchain</a></li>
+	<li><a data-entity-substitution="" data-entity-type="" data-entity-uuid="" href="https://www.ibm.com/thought-leadership/institute-business-value/?lnk=hpv18pt12">Institute for Business Value</a></li>
+</ul>
+      
+            </div>
+                  </div>
+      </div>
+    </div>
+
+      
+    </div>
+  </div>
+
+
+                </div>
+                        <span class="ibm-duo-carousel__counter ibm-duo-carousel__counter--3 bx--type-body-long-01 ibm-mb-1 ibm-textcolor-gray-90"></span>
+
+                          <button type="button" class="slick-arrow slick-next" data-ibm-cm-avoid="true">
+      <svg focusable="false" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" aria-label="Show next content"><polygon points="22,16 12,26 10.6,24.6 19.2,16 10.6,7.4 12,6"></polygon></svg>
+</button>
+                      </div>
+        </div>
+      
+    </div>
+  </section-->
+
+              
+
+
+
+
+
+  <section  role="article" lang="pt" about="/pt/node/2598824" id="2598824" class="ibm-duo-band ibm-duo-module-11a-double ibm-background-gray-100" data-bg-lazy-load>
+          <div class="ibm-grid-container" data-widget="setsameheight" data-always="true" data-items=".ibm-duo-module-11a-double__headline">
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-8 ibm-grid-col-seamless">
+                
+
+
+
+
+<div class="ibm-duo-module-11a-double ibm-duo-module-11a-double__item ibm-background-gray-100">
+      <div class="ibm-duo-module-11a-double__bg  ani-reveal ani-fadeInUp" style="background-image:url('imagens/20201217-cs-coca-cola-european-partners-1042x1130_0.jpg')" role="img" aria-label="Um copo de cola com gelo"></div>
+  
+  <div class="ibm-grid-container ibm-duo-module-11a-double__content">
+    <!--div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-10">
+              <div class="ibm-grid-col-sm-4-3 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-16 ibm-grid-col-seamless">
+          <!--h2 class="bx--type-expressive-heading-05 ibm-type-light ibm-textcolor-gray-10 ibm-mb-3 ibm-pb-0 ibm-duo-module-11a-double__headline ani-reveal ani-fadeInUp">
+                <span > Visita do EF Anos Finais</span>
+
+          </h2>
+        </div>
+      
+              <div class="ibm-grid-col-sm-4-3 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-grid-col-seamless">
+          <div class="bx--type-body-long-02 ibm-textcolor-gray-30 ibm-mb-0 ibm-duo-module-11a-double__subhead ibm-pb-1 ani-reveal ani-fadeInUp">
+                        <p>O IBM Multicloud Management mostra sistemas existentes e diferentes clouds em um único painel de controle</p>
+      
+          </div>
+        </div>
+          </div-->
+  </div>
+
+      <div class="ibm-duo-module-11a-double__cta">
+      <div class="ibm-grid-container">
+        <div class="ibm-grid-col-sm-4-2 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-8"></div>
+        <div class="ibm-grid-col-sm-4-2 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-8 ibm-duo-module-11a-double__cta-wrapper">
+          
+
+        
+  
+  
+  
+
+
+
+
+  <a  target="_self" href="#" class="ibm-duo-cta ani-reveal ani-fadeInUp">
+    <p class='ibm-type-e ibm-textcolor-white-core ibm-p ibm-mb-0'>Visita à Esplanada dos Ministérios</p>
+    <div class="ibm-duo-u--link-icon">
+      
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+    </div>
+  </a>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+            </div>
+                  <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-8 ibm-grid-col-seamless">
+                
+
+
+
+
+<div class="ibm-duo-module-11a-double ibm-duo-module-11a-double__item ibm-background-gray-100">
+      <div class="ibm-duo-module-11a-double__bg  ani-reveal ani-fadeInUp" style="background-image:url('imagens/cs-hub-logos-1042x1130.webp')" role="img" aria-label="Logotipos de vários clientes da IBM"></div>
+  
+  <div class="ibm-grid-container ibm-duo-module-11a-double__content">
+    <div class="ibm-grid-col-sm-4-4 ibm-grid-col-md-8-8 ibm-grid-col-lg-16-10">
+              <div class="ibm-grid-col-sm-4-3 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-16 ibm-grid-col-seamless">
+          <h2 class="bx--type-expressive-heading-05 ibm-type-light ibm-textcolor-gray-10 ibm-mb-3 ibm-pb-0 ibm-duo-module-11a-double__headline ani-reveal ani-fadeInUp">
+                <span > Invista em um ensino de qualidade e veja os resultados</span>
+
+          </h2>
+        </div>
+      
+              <div class="ibm-grid-col-sm-4-3 ibm-grid-col-md-8-6 ibm-grid-col-lg-16-12 ibm-grid-col-seamless">
+          <div class="bx--type-body-long-02 ibm-textcolor-gray-30 ibm-mb-0 ibm-duo-module-11a-double__subhead ibm-pb-1 ani-reveal ani-fadeInUp">
+                        <p>O CMSS está há 29 anos capacitando crianças e adolescentes para todas as etapas de suas vidas</p>
+      
+          </div>
+        </div>
+          </div>
+  </div>
+
+      <div class="ibm-duo-module-11a-double__cta">
+      <div class="ibm-grid-container">
+        <div class="ibm-grid-col-sm-4-2 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-8"></div>
+        <div class="ibm-grid-col-sm-4-2 ibm-grid-col-md-8-4 ibm-grid-col-lg-16-8 ibm-duo-module-11a-double__cta-wrapper" style="background-color: #f9eb1e">
+          
+
+        
+  
+  
+  
+
+
+
+
+  <a  target="_self" href="#" class="ibm-duo-cta ani-reveal ani-fadeInUp">
+    <p class='ibm-type-e ibm-textcolor-white-core ibm-p ibm-mb-0'>Conheça todos os projetos do CMSS</p>
+    <div class="ibm-duo-u--link-icon">
+      
+    
+        
+
+                      <svg focusable="false" class="ibm-duo-u--link-icon--arrow-right" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true" aria-label="View this link" width="20" height="20" viewBox="0 0 20 20" slot="icon"><path d="M11.8 2.8L10.8 3.8 16.2 9.3 1 9.3 1 10.7 16.2 10.7 10.8 16.2 11.8 17.2 19 10z"></path></svg>
+          
+    
+    </div>
+  </a>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+            </div>
+              <div>
+      </section>
+
+      
+          </div>
+
+        </div>       </div>     </div>   </div> </main>
+
+  </div>
+
+  </div>
+
+  </div>
+    <footer role="contentinfo" aria-label="IBM">
+      <div class="region region-footer">
+    
+
+<div id="ibm-footer-module">
+    <section role="region" aria-label="Resources">
+
+            <div class="ibm-columns">
+              </div>
+      
+        
+    </section>
+
+</div>
+
+
+<div id="ibm-footer">
+
+    <!--div class="ibm-columns">
+      <div class="ibm-col-1-1">
+                  <div class="ibm-footer-corporate-links">
+            <ul>
+                            <li id="ibm-truste-cp">
+                <a href="#" onclick="truste.eu.clickListener();return false;">Preferências de cookies</a>
+              </li>
+            </ul>
+          </div>
+        
+                </div>
+    </div-->
+
+</div>
+
+  </div>
+
+  </footer>
+  
+</div>
+
+  </div>
+
+<script src="cmss/scripts2/g24t.js"></script>
+<script src="cmss/scripts2/cm-app.min.js" defer></script>
+<script src="cmss/scripts2/tables.js" defer></script>
+<script src="cmss/scripts2/interactions.js" defer></script>
+<script src="cmss/scripts2/background-image-lazy-load.js" defer></script>
+<script src="cmss/scripts2/widgets.js" defer></script>
+<script src="cmss/scripts2/tactic.js" defer></script>
+<script src="cmss/scripts2/tacticbindlinks.js" defer></script>
+<script src="cmss/scripts2/d51y.js"></script>
+<script src="cmss/scripts2/slick-sliders.js" defer></script>
+<script src="cmss/scripts2/picture-fill-background.js" defer></script>
+
+      <link rel="stylesheet" type="text/css"  href="cmss/estilos/sec-3-6.css">
+            <script  src="cmss/scripts2/sec-cpt-3-6.js" async defer></script>
+            <div id="sec-overlay" style="display:none;">
+            <div id="sec-container">
+            </div>
+          </div>
+          
+          
+          
+
+  <section class="auth-overlay" data-role="auth-overlay" hidden>
+    <div class="auth-overlay__backdrop" data-role="auth-overlay-close" aria-hidden="true"></div>
+    <div class="auth-overlay__panel" role="dialog" aria-modal="true" aria-label="Acessar conta">
+      <button type="button" class="auth-overlay__close ghost" data-role="auth-overlay-close">Fechar</button>
+      <header class="auth-overlay__header">
+        <p class="auth-overlay__eyebrow">Acesso seguro</p>
+        <h2>Entre para dar lances</h2>
+        <span>Use sua conta ou crie um cadastro rápido para participar dos leilões.</span>
+      </header>
+      <div data-role="auth-overlay-slot"></div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+  
+
+  </body>
+</html>
