@@ -108,85 +108,6 @@ body.auth-overlay-open { overflow:hidden; }
   position:relative;
   z-index:1;
 }
-.menu-brand--left { justify-self:start; }
-.menu-brand--center { justify-self:center; width:min(560px, 100%); }
-.menu-brand--right { justify-self:end; }
-.menu-top-link {
-  color:var(--muted);
-  text-decoration:none;
-  font-size:0.88rem;
-  font-weight:600;
-  white-space:nowrap;
-  display:inline-flex;
-  align-items:center;
-  width:auto;
-  padding:0;
-  border:0;
-  background:transparent;
-}
-.header-account {
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.header-balance-chip {
-  display:flex;
-  flex-direction:column;
-  padding:7px 10px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--bg-alt);
-  line-height:1.1;
-}
-.header-balance-chip span { color:var(--muted); font-size:0.72rem; text-transform:uppercase; }
-.header-balance-chip strong { font-size:0.82rem; color:var(--text); }
-.header-deposit-btn {
-  border-radius:999px;
-  background:var(--accent);
-  color:#fff;
-  text-decoration:none;
-  padding:9px 14px;
-  font-size:0.84rem;
-  font-weight:600;
-}
-.header-avatar-menu { position:relative; }
-.header-avatar-menu summary { list-style:none; cursor:pointer; display:flex; align-items:center; }
-.header-avatar-menu summary::-webkit-details-marker { display:none; }
-.profile-avatar-fallback {
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  background:#0f172a;
-  color:#fff;
-  font-size:0.78rem;
-  font-weight:700;
-  border:1px solid var(--line);
-}
-.header-avatar-menu__panel {
-  position:absolute;
-  right:0;
-  top:calc(100% + 8px);
-  min-width:190px;
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:10px;
-  box-shadow:0 15px 35px rgba(15,23,42,0.14);
-  display:grid;
-  gap:8px;
-  z-index:30;
-}
-.header-avatar-menu__panel small { color:var(--muted); }
-.header-avatar-menu__panel button {
-  width:100%;
-  border-radius:10px;
-  padding:8px 10px;
-  background:#f1f5f9;
-  color:#0f172a;
-}
 .menu-brand { display:flex; flex-direction:column; gap:4px; }
 .menu-logo {
   color: #fff;
@@ -510,11 +431,18 @@ body.is-admin .admin-only { display:list-item; }
     grid-template-columns:1fr;
     align-items:flex-start;
   }
-  .menu-brand--center,
-  .menu-brand--right,
-  .menu-search { width:100%; justify-self:stretch; }
-  .menu-actions { justify-content:flex-start; flex-wrap:wrap; }
-  .header-account { width:100%; justify-content:flex-start; flex-wrap:wrap; }
+  .menu-brand { order:1; }
+  .menu-search { order:2; width:100%; }
+  .menu-actions {
+    order:3;
+    width:100%;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  #authBox {
+    width:min(360px, 100%);
+  }
 }
 
 @media (min-width: 961px) {
@@ -534,15 +462,11 @@ body.is-admin .admin-only { display:list-item; }
   }
   .menu-actions {
     align-items:center;
-    flex-wrap:wrap;
-    gap:8px;
+    flex-wrap:nowrap;
   }
   .menu-brand { flex:1; min-width:0; }
-  .auth-trigger { margin-left:0; }
-  .menu-top-link,
-  .header-balance-chip,
-  .header-deposit-btn { display:none; }
-  .header-account { margin-left:auto; }
+  .auth-trigger { margin-left:auto; }
+  .menu-actions__icon { display:none; }
   .menu-search {
     padding:10px 14px;
   }
