@@ -1791,3 +1791,42 @@ button:hover,
   max-width:720px;
 }
 
+
+.logged-chip {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:rgba(15,23,42,0.85);
+  border:1px solid rgba(148,163,184,0.35);
+  border-radius:999px;
+  padding:8px 10px;
+  min-width:260px;
+}
+.profile-avatar {
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid rgba(255,255,255,0.25);
+  background:#1f2937;
+}
+.profile-meta {
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+#profileName,
+#profileEmail {
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:180px;
+}
+#profileEmail { color: var(--muted); font-size: .78rem; }
+
+@media (max-width: 960px) {
+  .logged-chip { min-width: 0; width: 100%; border-radius: 14px; }
+  #profileName,
+  #profileEmail { max-width: 100%; }
+}

@@ -485,7 +485,7 @@ Bands/Sections:
         <!--span class="menu-tagline">Hub de leilões e ativos digitais</span-->
       </div>
         
-        <div class="menu-brand"><button class="auth-trigger" id="authOverlayButton" type="button">Entrar</button></div>
+        <div class="menu-brand"><button class="auth-trigger" id="openAuthBtn" type="button">Entrar</button></div>
         <div id="authBoxAnchor">
           <div id="authBox" class="card">
             <!-- Login -->
@@ -496,9 +496,13 @@ Bands/Sections:
             </form>
 
             <!-- Sessão ativa -->
-            <div id="loggedBox" style="display:none">
-              <p class="ok" id="sessionInfo">Conectado</p>
-              <button id="logoutBtn">Sair</button>
+            <div id="loggedBox" class="logged-chip" hidden>
+              <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar do perfil" />
+              <div class="profile-meta">
+                <strong id="profileName">Usuário</strong>
+                <small id="profileEmail"></small>
+              </div>
+              <button id="logoutBtn" type="button">Sair</button>
             </div>
 
             <hr/>

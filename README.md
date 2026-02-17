@@ -41,3 +41,10 @@ No front-end (`app.js`), o roteador também lê `window.location.pathname` no ca
 - Para debugar problemas de rota:
   - Verifique o `error_log` do Apache (rewrite/500).
   - No navegador, abra a aba **Network** e confira se `/api/*` retorna JSON (e não HTML da SPA).
+
+## Auth flow
+
+- `GET /api/session.php`: retorna sempre JSON no formato `{ logged, user, csrf_token, ... }`, onde `user` inclui `id`, `name`, `email` e `avatar_url` (quando autenticado).
+- `POST /auth/login.php`: recebe JSON `{ "email": "...", "password": "..." }`. Em sucesso, inicializa sessão PHP regenerando ID e retorna `{ ok:true, user_id, name, email, avatar_url, csrf_token }`.
+- `POST /auth/logout.php`: encerra a sessão atual, limpa `$_SESSION`, invalida cookie da sessão e retorna `{ ok:true }`.
+- Para login/logout, há modo CSRF compatível: se `X-CSRF-Token` for enviado, ele é validado; se não for enviado, a chamada segue funcionando por compatibilidade.

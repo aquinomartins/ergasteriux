@@ -2502,11 +2502,15 @@ function finishLiquidityGame(){
 /* ========= Auth UI ========= */
 async function refreshAuthUI(){
   const s = await getJSON(API('session.php'));
+  const user = s && s.user ? s.user : {};
+  window.__csrfToken = s && s.csrf_token ? s.csrf_token : (window.__csrfToken || null);
+
   currentSession = {
     logged: !!(s && s.logged),
-    user_id: s && typeof s.user_id !== 'undefined' && s.user_id !== null ? parseInt(s.user_id, 10) : null,
-    name: s && s.name ? String(s.name) : null,
-    email: s && s.email ? String(s.email) : null,
+    user_id: s && s.user_id != null ? parseInt(s.user_id, 10) : (user && user.id != null ? parseInt(user.id, 10) : null),
+    name: user && user.name ? String(user.name) : (s && s.name ? String(s.name) : null),
+    email: user && user.email ? String(user.email) : (s && s.email ? String(s.email) : null),
+    avatar_url: user && user.avatar_url ? String(user.avatar_url) : null,
     is_admin: !!(s && s.is_admin),
     is_special_liquidity_user: !!(s && s.is_special_liquidity_user),
     special_liquidity_email: s && s.special_liquidity_email ? String(s.special_liquidity_email) : null
@@ -2514,26 +2518,30 @@ async function refreshAuthUI(){
 
   const loginForm = document.getElementById('loginForm');
   const loggedBox = document.getElementById('loggedBox');
-  const sessionInfo = document.getElementById('sessionInfo');
+  const openAuthBtn = document.getElementById('openAuthBtn');
+  const profileName = document.getElementById('profileName');
+  const profileEmail = document.getElementById('profileEmail');
+  const profileAvatar = document.getElementById('profileAvatar');
 
   if (currentSession.logged) {
-    if (loginForm) loginForm.style.display = 'none';
-    if (loggedBox) loggedBox.style.display = 'block';
-    if (sessionInfo) {
-      let label = 'Conectado';
-      const identity = currentSession.name || currentSession.email;
-      if (identity) {
-        label += ` como ${identity}`;
-      }
-      if (currentSession.is_admin) {
-        label += ' • Admin';
-      }
-      sessionInfo.textContent = label;
+    if (loginForm) loginForm.hidden = true;
+    if (loggedBox) loggedBox.hidden = false;
+    if (openAuthBtn) openAuthBtn.hidden = true;
+
+    const identityName = currentSession.name || currentSession.email || 'Usuário';
+    if (profileName) profileName.textContent = identityName;
+    if (profileEmail) profileEmail.textContent = currentSession.email || '';
+    if (profileAvatar) {
+      const avatarName = encodeURIComponent(identityName);
+      profileAvatar.src = currentSession.avatar_url || `https://ui-avatars.com/api/?name=${avatarName}&background=1f2937&color=ffffff&size=64`;
+      profileAvatar.alt = `Avatar de ${identityName}`;
     }
   } else {
-    if (loginForm) loginForm.style.display = 'block';
-    if (loggedBox) loggedBox.style.display = 'none';
-    if (sessionInfo) sessionInfo.textContent = 'Conectado';
+    if (loginForm) loginForm.hidden = false;
+    if (loggedBox) loggedBox.hidden = true;
+    if (openAuthBtn) openAuthBtn.hidden = false;
+    if (profileName) profileName.textContent = 'Usuário';
+    if (profileEmail) profileEmail.textContent = '';
   }
 
   if (document.body) {
@@ -2553,12 +2561,13 @@ function initAuth(){
     const password = document.getElementById('password').value;
     const res = await fetch(AUTH('login.php'), {
       method: 'POST', credentials:'include',
-      headers: {'Content-Type':'application/json'},
+      headers: {'Content-Type':'application/json', ...(window.__csrfToken ? {'X-CSRF-Token': window.__csrfToken} : {})},
       body: JSON.stringify({email,password})
     });
     const msg = document.getElementById('authMsg');
     if (res.ok) {
       msg.textContent = 'Login efetuado!';
+      msg.classList.remove('err');
       await refreshAuthUI();
       closeAuthOverlay();
       navigateToView('home', { updateUrl: true });
@@ -2576,7 +2585,7 @@ function initAuth(){
   });
   // logout
   document.getElementById('logoutBtn').addEventListener('click', async ()=>{
-    await fetch(AUTH('logout.php'), { credentials:'include' });
+    await fetch(AUTH('logout.php'), { method:'POST', credentials:'include', headers: window.__csrfToken ? {'X-CSRF-Token': window.__csrfToken} : {} });
     await refreshAuthUI();
     closeAuthOverlay();
     getSpaView().innerHTML = `<h1>Até mais!</h1><p>Você saiu da conta.</p>`;
@@ -2622,7 +2631,7 @@ function initAuth(){
 /* ========= Views ========= */
 async function viewSaldo(){
   const data = await getJSON(API(`balance.php`));
-  if (data.__auth===false) return needLogin();
+  if (data.__auth===false) { await refreshAuthUI(); return currentSession.logged ? null : needLogin(); }
   const acc = table(data.accounts, ['currency','purpose','balance'], ['Moeda','Finalidade','Saldo']);
   const hist = table(data.journals, ['id','occurred_at','ref_type','memo','debit','credit'],
                      ['#','Quando','Tipo','Memo','Débito','Crédito']);
@@ -2631,7 +2640,7 @@ async function viewSaldo(){
 
 async function viewBitcoin(){
   const d = await getJSON(API(`bitcoin.php`));
-  if (d.__auth===false) return needLogin();
+  if (d.__auth===false) { await refreshAuthUI(); return currentSession.logged ? null : needLogin(); }
   getSpaView().innerHTML =
     `<h1>Bitcoin</h1><p><strong>Total BTC:</strong> ${d.btc_total ?? 0}</p>
      <h2>Recebidos</h2>${table(d.recebidos,['occurred_at','ref_type','memo','amount'],['Quando','Tipo','Memo','Valor'])}
@@ -2640,7 +2649,7 @@ async function viewBitcoin(){
 
 async function viewNFT(){
   const d = await getJSON(API(`nfts.php`));
-  if (d.__auth===false) return needLogin();
+  if (d.__auth===false) { await refreshAuthUI(); return currentSession.logged ? null : needLogin(); }
   const obras = table(d.obras,['work_id','title','asset_id','instance_id'],['#','Título','Asset','Instância']);
   const chassis = table(d.chassis,['id','size','material','status'],['#','Tamanho','Material','Status']);
   const extra = `<div class="actions"><button id="mintBtn" style="margin-top:8px;width:auto">Criar NFT de Teste</button><span class="badge">demo</span></div>`;
@@ -2672,7 +2681,7 @@ async function renderMercado(kind){
 async function loadOffers(kind){
   const url = API(`offers.php?kind=${kind}`);
   const data = await getJSON(url);
-  if (data.__auth===false) return needLogin();
+  if (data.__auth===false) { await refreshAuthUI(); return currentSession.logged ? null : needLogin(); }
   const rows = (data||[]).map(o => ({
     id:o.id, tipo:o.kind, instancia:o.asset_instance_id||'', qtd:o.qty, preco:o.price_brl, vendedor:o.seller_id
   }));
@@ -3524,7 +3533,7 @@ async function loadLiveMarketHistory(){
 async function viewTrades(){
   getSpaView().innerHTML = `<h1>Trades (últimos)</h1><div id="tradesBox"></div>`;
   const d = await getJSON(API(`trades.php`));
-  if (d.__auth===false) return needLogin();
+  if (d.__auth===false) { await refreshAuthUI(); return currentSession.logged ? null : needLogin(); }
   const arr = Array.isArray(d) ? d : [];
   const rows = arr.map(t => ({ id:t.id, qty:t.qty, price:t.price, created_at:t.created_at }));
   document.getElementById('tradesBox').innerHTML = table(rows,['id','qty','price','created_at'],['#','Qtd','Preço','Quando']);
@@ -6886,7 +6895,7 @@ function initAuthOverlayControls(){
 }
 
 function initAuthTrigger(){
-  const trigger = document.getElementById('authOverlayButton');
+  const trigger = document.getElementById('openAuthBtn');
   if (!trigger) return;
   trigger.addEventListener('click', (event)=>{
     event.preventDefault();
@@ -7056,7 +7065,6 @@ function initAmbientParallax(){
 
 /* ========= Init ========= */
 const defaultViewName = getSpaView()?.dataset.defaultView || 'home';
-initAuth();
 initAuthOverlayControls();
 initAuthTrigger();
 initMenu();
@@ -7064,3 +7072,10 @@ initDeepLink();
 initHistoryNavigation();
 initResponsiveMenu();
 initAmbientParallax();
+
+window.addEventListener('focus', ()=>{ refreshAuthUI(); });
+
+(async function bootApp(){
+  await refreshAuthUI();
+  initAuth();
+})();

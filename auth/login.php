@@ -1,22 +1,42 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+
 require_once __DIR__ . '/../lib/session.php';
 start_app_session();
 require_once __DIR__ . '/../lib/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
-  echo json_encode(['error' => 'POST only']);
+  echo json_encode(['ok' => false, 'error' => 'method_not_allowed', 'detail' => 'Use POST.']);
   exit;
 }
 
+$providedCsrf = csrf_token_from_request();
+if ($providedCsrf !== null) {
+  require_csrf_token('login');
+}
+
 $body = json_decode(file_get_contents('php://input'), true);
-$email = trim($body['email'] ?? '');
-$pass  = $body['password'] ?? '';
+if (!is_array($body)) {
+  http_response_code(400);
+  echo json_encode(['ok' => false, 'error' => 'invalid_json']);
+  exit;
+}
+
+$email = trim((string)($body['email'] ?? ''));
+$pass  = (string)($body['password'] ?? '');
 
 if ($email === '' || $pass === '') {
-  http_response_code(400);
-  echo json_encode(['error' => 'missing_credentials']);
+  http_response_code(422);
+  echo json_encode([
+    'ok' => false,
+    'error' => 'validation_error',
+    'fields' => [
+      'email' => $email === '' ? 'required' : null,
+      'password' => $pass === '' ? 'required' : null,
+    ],
+  ]);
   exit;
 }
 
@@ -25,11 +45,15 @@ $stmt = $pdo->prepare("SELECT id, name, email, password_hash, COALESCE(confirmed
 $stmt->execute([$email]);
 $user = $stmt->fetch();
 
-if (!$user) { http_response_code(401); echo json_encode(['error'=>'invalid_credentials']); exit; }
+if (!$user) {
+  http_response_code(401);
+  echo json_encode(['ok' => false, 'error' => 'invalid_credentials']);
+  exit;
+}
 
 if (intval($user['confirmed']) !== 1) {
   http_response_code(403);
-  echo json_encode(['error' => 'email_not_confirmed']);
+  echo json_encode(['ok' => false, 'error' => 'email_not_confirmed']);
   exit;
 }
 
@@ -43,7 +67,11 @@ if (is_string($hash) && (strpos($hash, '$2y$') === 0 || strpos($hash, '$argon2')
   $ok = false;
 }
 
-if (!$ok) { http_response_code(401); echo json_encode(['error'=>'invalid_credentials']); exit; }
+if (!$ok) {
+  http_response_code(401);
+  echo json_encode(['ok' => false, 'error' => 'invalid_credentials']);
+  exit;
+}
 
 if (password_needs_rehash($hash, PASSWORD_BCRYPT)) {
   $newHash = password_hash($pass, PASSWORD_BCRYPT);
@@ -58,10 +86,13 @@ $_SESSION['name'] = $user['name'] ?? null;
 $_SESSION['email'] = $user['email'] ?? null;
 $_SESSION['is_admin'] = intval($user['is_admin'] ?? 0) === 1;
 $csrf = csrf_token();
+
 echo json_encode([
   'ok' => true,
   'user_id' => intval($user['id']),
   'is_admin' => intval($user['is_admin'] ?? 0) === 1,
   'name' => $user['name'] ?? null,
+  'email' => $user['email'] ?? null,
+  'avatar_url' => null,
   'csrf_token' => $csrf
 ]);
