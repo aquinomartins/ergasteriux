@@ -475,40 +475,65 @@ Bands/Sections:
       
       <header class="menu site-header" id="appMenu">
     <div class="menu-top">
-
-      <div class="menu-actions">
-        <div class="menu-brand">
-        <div class="menu-logo" data-view="home" href="#">
-  <!--img src="uploads/logoErgasterio.svg" alt="Logo Ergastério São Lucas"-->
-  <span>Ergastério São Lucas</span>
-</div>
-        <!--span class="menu-tagline">Hub de leilões e ativos digitais</span-->
+      <div class="menu-brand menu-brand--left">
+        <div class="menu-logo" data-view="home" role="button" tabindex="0" aria-label="Ir para Home">
+          <span>Ergastério São Lucas</span>
+        </div>
       </div>
-        
-        <div class="menu-brand"><button class="auth-trigger" id="openAuthBtn" type="button">Entrar</button></div>
+
+      <div class="menu-search menu-brand--center" role="search">
+        <span class="menu-search__icon" aria-hidden="true">🔎</span>
+        <input id="menuSearchInput" type="search" placeholder="Buscar mercados, ativos e eventos" aria-label="Buscar no aplicativo" />
+      </div>
+
+      <div class="menu-actions menu-brand--right">
+        <a href="#" data-view="mechanics" class="menu-top-link" id="howItWorksLink">Como funciona?</a>
+        <button class="ghost menu-top-link" id="headerRegisterBtn" type="button">Criar conta</button>
+        <button class="auth-trigger" id="openAuthBtn" type="button">Entrar</button>
+
+        <div id="headerLoggedBox" class="header-account" hidden>
+          <div class="header-balance-chip"><span>Portfólio</span><strong>R$ 0,00</strong></div>
+          <div class="header-balance-chip"><span>Cash</span><strong>R$ 0,00</strong></div>
+          <a href="#" class="header-deposit-btn" data-view="user_assets">Depositar</a>
+          <details class="header-avatar-menu" id="headerAvatarMenu">
+            <summary aria-label="Abrir menu do usuário">
+              <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar do perfil" hidden />
+              <span id="profileAvatarFallback" class="profile-avatar-fallback">U</span>
+            </summary>
+            <div class="header-avatar-menu__panel">
+              <strong id="profileName">Usuário</strong>
+              <small id="profileEmail"></small>
+              <button id="logoutBtn" type="button">Sair</button>
+            </div>
+          </details>
+        </div>
+
+        <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="menuContent" aria-label="Abrir menu">
+          <span class="menu-toggle__icon" aria-hidden="true">
+            <span class="menu-toggle__bar"></span>
+            <span class="menu-toggle__bar"></span>
+            <span class="menu-toggle__bar"></span>
+          </span>
+        </button>
+
         <div id="authBoxAnchor">
           <div id="authBox" class="card">
-            <!-- Login -->
             <form id="loginForm">
               <input type="email" id="email" placeholder="email" required />
               <input type="password" id="password" placeholder="senha" required />
               <button type="submit">Entrar</button>
             </form>
 
-            <!-- Sessão ativa -->
             <div id="loggedBox" class="logged-chip" hidden>
-              <img id="profileAvatar" class="profile-avatar" src="" alt="Avatar do perfil" />
+              <img class="profile-avatar" src="" alt="Avatar do perfil" />
               <div class="profile-meta">
-                <strong id="profileName">Usuário</strong>
-                <small id="profileEmail"></small>
+                <strong>Usuário</strong>
+                <small></small>
               </div>
-              <button id="logoutBtn" type="button">Sair</button>
             </div>
 
             <hr/>
-
-            <!-- Toggle Registro -->
-            <button id="toggleRegister" class="ghost">Registrar novo usuário</button>
+            <button id="toggleRegister" class="ghost" type="button">Registrar novo usuário</button>
             <form id="registerForm" style="display:none; margin-top:8px;">
               <input type="text" id="r_name" placeholder="nome" required />
               <input type="email" id="r_email" placeholder="email" required />
@@ -519,11 +544,10 @@ Bands/Sections:
             <p id="authMsg" class="msg"></p>
           </div>
         </div>
-        <!--div class="menu-brand"><span class="menu-actions__icon" aria-hidden="true">🔎</span></div-->
       </div>
     </div>
 
-    <div class="menu-content2" id="menuContent">
+    <div class="menu-content" id="menuContent">
       <nav class="menu-nav" aria-label="Navegação principal">
         <ul>
           <li><a href="#" data-view="home" aria-current="page">Home</a></li>
