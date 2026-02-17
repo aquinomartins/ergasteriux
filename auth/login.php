@@ -1,0 +1,67 @@
+<?php
+header('Content-Type: application/json');
+require_once __DIR__ . '/../lib/session.php';
+start_app_session();
+require_once __DIR__ . '/../lib/db.php';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+  http_response_code(405);
+  echo json_encode(['error' => 'POST only']);
+  exit;
+}
+
+$body = json_decode(file_get_contents('php://input'), true);
+$email = trim($body['email'] ?? '');
+$pass  = $body['password'] ?? '';
+
+if ($email === '' || $pass === '') {
+  http_response_code(400);
+  echo json_encode(['error' => 'missing_credentials']);
+  exit;
+}
+
+$pdo = db();
+$stmt = $pdo->prepare("SELECT id, name, email, password_hash, COALESCE(confirmed,0) AS confirmed, COALESCE(is_admin,0) AS is_admin FROM users WHERE email=? LIMIT 1");
+$stmt->execute([$email]);
+$user = $stmt->fetch();
+
+if (!$user) { http_response_code(401); echo json_encode(['error'=>'invalid_credentials']); exit; }
+
+if (intval($user['confirmed']) !== 1) {
+  http_response_code(403);
+  echo json_encode(['error' => 'email_not_confirmed']);
+  exit;
+}
+
+$hash = $user['password_hash'];
+$ok = false;
+if (is_string($hash) && (strpos($hash, '$2y$') === 0 || strpos($hash, '$argon2') === 0)) {
+  $ok = password_verify($pass, $hash);
+} elseif (is_string($hash) && preg_match('/^[a-f0-9]{64}$/i', $hash)) {
+  $ok = hash_equals($hash, hash('sha256', $pass));
+} else {
+  $ok = false;
+}
+
+if (!$ok) { http_response_code(401); echo json_encode(['error'=>'invalid_credentials']); exit; }
+
+if (password_needs_rehash($hash, PASSWORD_BCRYPT)) {
+  $newHash = password_hash($pass, PASSWORD_BCRYPT);
+  $upd = $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?');
+  $upd->execute([$newHash, intval($user['id'])]);
+  $hash = $newHash;
+}
+
+session_regenerate_id(true);
+$_SESSION['uid'] = intval($user['id']);
+$_SESSION['name'] = $user['name'] ?? null;
+$_SESSION['email'] = $user['email'] ?? null;
+$_SESSION['is_admin'] = intval($user['is_admin'] ?? 0) === 1;
+$csrf = csrf_token();
+echo json_encode([
+  'ok' => true,
+  'user_id' => intval($user['id']),
+  'is_admin' => intval($user['is_admin'] ?? 0) === 1,
+  'name' => $user['name'] ?? null,
+  'csrf_token' => $csrf
+]);
