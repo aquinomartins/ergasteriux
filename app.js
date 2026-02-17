@@ -2518,30 +2518,60 @@ async function refreshAuthUI(){
 
   const loginForm = document.getElementById('loginForm');
   const loggedBox = document.getElementById('loggedBox');
+  const headerLoggedBox = document.getElementById('headerLoggedBox');
   const openAuthBtn = document.getElementById('openAuthBtn');
+  const headerRegisterBtn = document.getElementById('headerRegisterBtn');
   const profileName = document.getElementById('profileName');
   const profileEmail = document.getElementById('profileEmail');
   const profileAvatar = document.getElementById('profileAvatar');
+  const profileAvatarFallback = document.getElementById('profileAvatarFallback');
 
   if (currentSession.logged) {
     if (loginForm) loginForm.hidden = true;
     if (loggedBox) loggedBox.hidden = false;
+    if (headerLoggedBox) headerLoggedBox.hidden = false;
     if (openAuthBtn) openAuthBtn.hidden = true;
+    if (headerRegisterBtn) headerRegisterBtn.hidden = true;
 
     const identityName = currentSession.name || currentSession.email || 'Usuário';
     if (profileName) profileName.textContent = identityName;
     if (profileEmail) profileEmail.textContent = currentSession.email || '';
+    const initials = identityName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part)=>part.charAt(0).toUpperCase())
+      .join('') || 'U';
+    if (profileAvatarFallback) profileAvatarFallback.textContent = initials;
     if (profileAvatar) {
-      const avatarName = encodeURIComponent(identityName);
-      profileAvatar.src = currentSession.avatar_url || `https://ui-avatars.com/api/?name=${avatarName}&background=1f2937&color=ffffff&size=64`;
-      profileAvatar.alt = `Avatar de ${identityName}`;
+      if (currentSession.avatar_url) {
+        profileAvatar.src = currentSession.avatar_url;
+        profileAvatar.alt = `Avatar de ${identityName}`;
+        profileAvatar.hidden = false;
+        if (profileAvatarFallback) profileAvatarFallback.hidden = true;
+      } else {
+        profileAvatar.hidden = true;
+        if (profileAvatarFallback) profileAvatarFallback.hidden = false;
+      }
     }
   } else {
     if (loginForm) loginForm.hidden = false;
     if (loggedBox) loggedBox.hidden = true;
+    if (headerLoggedBox) headerLoggedBox.hidden = true;
     if (openAuthBtn) openAuthBtn.hidden = false;
+    if (headerRegisterBtn) headerRegisterBtn.hidden = false;
     if (profileName) profileName.textContent = 'Usuário';
     if (profileEmail) profileEmail.textContent = '';
+    if (profileAvatar) {
+      profileAvatar.hidden = true;
+      profileAvatar.removeAttribute('src');
+    }
+    if (profileAvatarFallback) {
+      profileAvatarFallback.hidden = false;
+      profileAvatarFallback.textContent = 'U';
+    }
+    const avatarMenu = document.getElementById('headerAvatarMenu');
+    if (avatarMenu) avatarMenu.open = false;
   }
 
   if (document.body) {
@@ -2588,6 +2618,8 @@ function initAuth(){
     await fetch(AUTH('logout.php'), { method:'POST', credentials:'include', headers: window.__csrfToken ? {'X-CSRF-Token': window.__csrfToken} : {} });
     await refreshAuthUI();
     closeAuthOverlay();
+    const avatarMenu = document.getElementById('headerAvatarMenu');
+    if (avatarMenu) avatarMenu.open = false;
     getSpaView().innerHTML = `<h1>Até mais!</h1><p>Você saiu da conta.</p>`;
   });
   // toggle register
@@ -6881,6 +6913,13 @@ function initMenu(){
     }
     navigateToView(viewName, { updateUrl: true });
   });
+  document.addEventListener('keydown', (event)=>{
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const trigger = event.target.closest('.menu-logo[data-view]');
+    if (!trigger) return;
+    event.preventDefault();
+    navigateToView(trigger.dataset.view, { updateUrl: true });
+  });
 }
 
 function initAuthOverlayControls(){
@@ -6896,11 +6935,19 @@ function initAuthOverlayControls(){
 
 function initAuthTrigger(){
   const trigger = document.getElementById('openAuthBtn');
-  if (!trigger) return;
-  trigger.addEventListener('click', (event)=>{
-    event.preventDefault();
-    showAuthOverlay();
-  });
+  if (trigger) {
+    trigger.addEventListener('click', (event)=>{
+      event.preventDefault();
+      showAuthOverlay();
+    });
+  }
+  const registerTrigger = document.getElementById('headerRegisterBtn');
+  if (registerTrigger) {
+    registerTrigger.addEventListener('click', (event)=>{
+      event.preventDefault();
+      showAuthOverlay({ focusRegister: true });
+    });
+  }
 }
 
 function initResponsiveMenu(){
